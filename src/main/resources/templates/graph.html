@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8">
     <style>
     .links line {
       stroke: #999;
@@ -12,11 +11,10 @@
       stroke: #fff;
       stroke-width: 1.5px;
     }
-
     </style>
-    <svg width="960" height="600"></svg>
     <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script>
+    <script th:inline="javascript">
+    /*<![CDATA[*/
     var svg = d3.select("svg"),
         width = +svg.attr("width"),
         height = +svg.attr("height");
@@ -28,7 +26,11 @@
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(width / 2, height / 2));
 
-      d3.json("C:\Users\tim\Desktop\Webapp\Graph\datum-2017-02-01-suche.json", function(error, graph) {
+    var str = [[${graph}]];
+    var res = str.replace("\\", "\");
+    document.write('Hallo Welt!');
+    document.write(res);
+    d3.json(res, function(error, graph) {
       if (error) throw error;
 
       var link = svg.append("g")
@@ -89,32 +91,13 @@
       d.fx = null;
       d.fy = null;
     }
-
+    /*]]>*/
     </script>
-    <title>Supertool</title>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-
-<div style="float: right; margin-right: 25%">
-    <h2>Statistiken:</h2>
-    <ul>
-        <li>Tim ist der coolste</li>
-        <li>Bobby nieeechht</li>
-    </ul>
-</div>
-
-<h2>Suchen:</h2>
-<form action="http://localhost:8080/search" method="get">
-Suchbegriff: <input type="text" name="fname"><br>
-<input type="submit" value="Suchen!">
-</form>
-
-<h2>Upload:</h2>
-<form method="post" action="http://localhost:8080/upload" enctype="multipart/form-data">
-    <label>Wählen Sie eine PDF-Datei (*.pdf) von Ihrem Rechner aus.
-        <input name="file" type="file" accept="application/pdf/*">
-    </label>
-    <button>Hochladen</button>
-</form>
+<svg width="960" height="600"></svg>
+<p th:text="${graph}" />
 </body>
 </html>

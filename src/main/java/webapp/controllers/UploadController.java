@@ -1,5 +1,6 @@
 package webapp.controllers;
 
+import com.sun.javafx.runtime.SystemProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,7 +23,8 @@ import java.nio.file.Paths;
 public class UploadController {
 
     //Save the uploaded file to this folder
-    private static String UPLOADED_FOLDER = "C:\\Users\\Bobby\\Desktop\\Uni\\UploadTest";
+
+    private static String UPLOADED_FOLDER = System.getProperty("user.home")+"\\Desktop\\Webapp\\Upload\\";
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String singleFileUpload(@RequestParam("file") MultipartFile file,
@@ -34,20 +38,20 @@ public class UploadController {
 
         try {
 
-            // Get the file and save it somewhere
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOADED_FOLDER + file.getOriginalFilename());
-
             model.addAttribute("filename", file.getOriginalFilename());
-            Files.write(path, bytes);
 
-            redirectAttributes.addFlashAttribute("message",
-                    "You successfully uploaded '" + file.getOriginalFilename() + "'");
+            File f = new File(UPLOADED_FOLDER + file.getOriginalFilename());
+            f.getParentFile().mkdirs();
+
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get(f.getPath());
+
+            Files.write(path, bytes);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return "upload";
-    }
+}
 }
