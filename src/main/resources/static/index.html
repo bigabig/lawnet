@@ -28,7 +28,7 @@
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(width / 2, height / 2));
 
-      d3.json("C:\Users\tim\Desktop\Webapp\Graph\datum-2017-02-01-suche.json", function(error, graph) {
+      d3.json('miserables.json', function(error, graph) {
       if (error) throw error;
 
       var link = svg.append("g")
@@ -115,6 +115,17 @@ Suchbegriff: <input type="text" name="fname"><br>
         <input name="file" type="file" accept="application/pdf/*">
     </label>
     <button>Hochladen</button>
+</form>
+
+<br>
+<br>
+
+<h2>Datumssuche:</h2>
+<form action="http://localhost:8080/graph" method="get">
+    Datum: <input type="date" name="datum" value="2017-02-01" min="2015-01-01" max="2018-01-01"><br>
+    Zitate: <input type="radio" name="zitat" value="active" checked>Aktiv<br>
+    <input type="radio" name="zitat" value="passiv">Passiv<br>
+    <input type="submit" value="Suchen!">
 </form>
 </body>
 </html>

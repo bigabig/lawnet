@@ -12,9 +12,11 @@
       stroke-width: 1.5px;
     }
     </style>
+    <svg width="960" height="600"></svg>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script th:inline="javascript">
     /*<![CDATA[*/
+
     var svg = d3.select("svg"),
         width = +svg.attr("width"),
         height = +svg.attr("height");
@@ -26,11 +28,8 @@
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(width / 2, height / 2));
 
-    var str = [[${graph}]];
-    var res = str.replace("\\", "\");
-    document.write('Hallo Welt!');
-    document.write(res);
-    d3.json(res, function(error, graph) {
+    var dateiname = [[${filename}]]
+    d3.json("http://localhost:8080/graph/"+dateiname, function(error, graph) {
       if (error) throw error;
 
       var link = svg.append("g")
@@ -97,7 +96,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-<svg width="960" height="600"></svg>
 <p th:text="${graph}" />
 </body>
 </html>
