@@ -95,7 +95,9 @@ public class GraphController {
         for(Metadata m : meta) {
             Node n = new Node(m.getAktenzeichen(), 1);
             nodes.add(n);
+        }
 
+        for(Metadata m : meta) {
             List<Zitat> zitate = null;
             if(zitat.equals("active")) {
                 zitate = zitatDao.findByAktenzeichen1(m.getAktenzeichen());
@@ -116,7 +118,7 @@ public class GraphController {
                     }
 
                     if(metadata != null) {
-                        Node node = new Node(metadata.getAktenzeichen(), 1);
+                        Node node = new Node(metadata.getAktenzeichen(), 2);
                         if(!nodes.contains(node))
                             nodes.add(node);
                     }

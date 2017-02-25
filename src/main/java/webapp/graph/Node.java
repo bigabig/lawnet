@@ -14,4 +14,13 @@ public class Node {
     private String id;
     private int group;
 
+    @Override
+    public boolean equals(Object other){
+        if (other == null) return false;
+        if (other == this) return true;
+        if (!(other instanceof Node))return false;
+        Node otherNode = (Node) other;
+        return (this.id == otherNode.id);
+    }
+
 }

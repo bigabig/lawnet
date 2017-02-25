@@ -2,17 +2,30 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <style>
-    .links line {
+    .links polyline {
       stroke: #999;
       stroke-opacity: 0.6;
+      marker-mid: url(#arrow);
+    }
+
+    svg path {
+        stroke: #999;
+        stroke-opacity: 1;
+        stroke-linejoin: round;
+        fill:none;
     }
 
     .nodes circle {
       stroke: #fff;
       stroke-width: 1.5px;
     }
+
     </style>
-    <svg width="960" height="600"></svg>
+    <svg width="960" height="600">
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="2" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L4,2 0,4"></path>
+        </marker>
+    </svg>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script th:inline="javascript">
     /*<![CDATA[*/
@@ -34,9 +47,9 @@
 
       var link = svg.append("g")
           .attr("class", "links")
-        .selectAll("line")
+        .selectAll("polyline")
         .data(graph.links)
-        .enter().append("line")
+        .enter().append("polyline")
           .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
 
       var node = svg.append("g")
@@ -63,10 +76,15 @@
 
       function ticked() {
         link
-            .attr("x1", function(d) { return d.source.x; })
-            .attr("y1", function(d) { return d.source.y; })
-            .attr("x2", function(d) { return d.target.x; })
-            .attr("y2", function(d) { return d.target.y; });
+            .attr("points", function(d) {
+                var x1 = d.source.x;
+                var y1 = d.source.y;
+                var x3 = d.target.x;
+                var y3 = d.target.y;
+                var x2 = x1 + 0.5 * (x3 - x1);
+                var y2 = y1 + 0.5 * (y3 - y1);
+                return x1+","+y1+" "+x2+","+y2+" "+x3+","+y3;
+            });
 
         node
             .attr("cx", function(d) { return d.x; })
