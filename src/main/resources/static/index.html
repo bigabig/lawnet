@@ -103,10 +103,28 @@
     </ul>
 </div>
 
-<h2>Suchen:</h2>
-<form action="http://localhost:8080/search" method="get">
-Suchbegriff: <input type="text" name="fname"><br>
-<input type="submit" value="Suchen!">
+<h2>Suche</h2>
+<form action="http://localhost:8080/graph" method="get">
+    <label>Aktenzeichen
+        <input type="text" name="aktenzeichen">
+    </label>
+    <label>Datum
+        <input type="date" name="datum" value="2017-02-01" min="2015-01-01" max="2018-01-01">
+    </label>
+    <label>Typ:
+        <select name="typ" size="1">
+            <option value="">Alle Typen</option>
+            <option value="urteil">Urteil</option>
+            <option value="beschluss">Beschluss</option>
+        </select>
+    </label>
+    <label>Zitierung:
+        <select name="zitat" size="1">
+            <option value="active">Aktiv</option>
+            <option value="passiv">Passiv</option>
+        </select>
+    </label>
+    <input type="submit" value="Suchen!">
 </form>
 
 <h2>Upload:</h2>
@@ -115,17 +133,6 @@ Suchbegriff: <input type="text" name="fname"><br>
         <input name="file" type="file" accept="application/pdf/*">
     </label>
     <button>Hochladen</button>
-</form>
-
-<br>
-<br>
-
-<h2>Datumssuche:</h2>
-<form action="http://localhost:8080/graph" method="get">
-    Datum: <input type="date" name="datum" value="2017-02-01" min="2015-01-01" max="2018-01-01"><br>
-    Zitate: <input type="radio" name="zitat" value="active" checked>Aktiv<br>
-    <input type="radio" name="zitat" value="passiv">Passiv<br>
-    <input type="submit" value="Suchen!">
 </form>
 </body>
 </html>

@@ -46,17 +46,45 @@ public class GraphController {
                        @RequestParam(value="typ", required=false, defaultValue="") String typ,
                        @RequestParam(value="zitat", required=false, defaultValue="active") String zitat, Model model) {
 
-        // MySQL-Anfrage: Alle Metadaten mit dem Datum datum
-        List<Metadata> meta = metadataDao.findByDatum(datum);
+        String message = "Aktenzeichen: "+aktenzeichen+"\nDatum: "+datum+"\nTyp: "+typ+"\nZitat: "+zitat;
+        System.out.println(message);
+        String filename;
 
+        // MySQL-Abfrage abhängig vom Request
+        List<Metadata> meta = null;
+
+        if(!aktenzeichen.equals("")) {
+            meta = new ArrayList<Metadata>();
+            meta.add(metadataDao.findByAktenzeichen(aktenzeichen));
+            filename = "aktenzeichen-"+aktenzeichen+"-suche.json";
+        } else if(!datum.equals("") && !typ.equals("")) {
+            meta = metadataDao.findByDatumAndTyp(datum, typ);
+            filename = "datumtyp-"+datum+typ+"-suche.json";
+        } else if(!datum.equals("")) {
+            meta = metadataDao.findByDatum(datum);
+            filename = "datum-"+datum+"-suche.json";
+        } else if(!typ.equals("")) {
+            meta = metadataDao.findByTyp(typ);
+            filename = "typ-"+typ+"-suche.json";
+        } else {
+            return "error";
+        }
+
+        if(meta == null || !(zitat.equals("active") | zitat.equals("passiv"))) {
+            return "error";
+        }
+
+        // Metadaten nach JSON-String umwandeln
         String data = metaToJSON(meta, zitat);
 
-        String filename = "datum-"+datum+"-suche.json";
+        // JSON-String als JSON-Datei abspeichern
         saveJSONFile(filename, data);
 
         // Übergeben des Filenames an Template
         model.addAttribute("filename", filename);
+        model.addAttribute("message", message);
 
+        // Darstellung der JSON-Datei als Graph
         return "graph";
     }
 
@@ -71,12 +99,9 @@ public class GraphController {
             List<Zitat> zitate = null;
             if(zitat.equals("active")) {
                 zitate = zitatDao.findByAktenzeichen1(m.getAktenzeichen());
-                System.out.println("active!");
             } else if (zitat.equals("passiv")) {
                 zitate = zitatDao.findByAktenzeichen2(m.getAktenzeichen());
-                System.out.println("passiv!");
             }
-            System.out.println(zitate);
 
             if(zitate != null) {
                 for(Zitat z : zitate) {
@@ -90,9 +115,11 @@ public class GraphController {
                         metadata = metadataDao.findByAktenzeichen(z.getAktenzeichen1());
                     }
 
-                    Node node = new Node(metadata.getAktenzeichen(), 1);
-                    if(!nodes.contains(node))
-                        nodes.add(node);
+                    if(metadata != null) {
+                        Node node = new Node(metadata.getAktenzeichen(), 1);
+                        if(!nodes.contains(node))
+                            nodes.add(node);
+                    }
                 }
             }
         }
@@ -103,7 +130,6 @@ public class GraphController {
     }
 
     private void saveJSONFile(String filename, String jsonString) {
-
         // Speicherort für das Ergebnis (JSON Datei)
         File f = new File(GRAPH_FOLDER + filename);
         f.getParentFile().mkdirs();

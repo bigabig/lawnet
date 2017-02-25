@@ -1,1 +1,1 @@
-{"nodes":[],"links":[]}
+{"nodes":[{"id":"321cba","group":1},{"id":"789aer","group":1},{"id":"qwert43","group":1},{"id":"654321","group":1},{"id":"trewq34","group":1},{"id":"987zxc","group":1},{"id":"123abc","group":1},{"id":"trewq34","group":1},{"id":"trewq34","group":1}],"links":[{"source":"321cba","target":"789aer","value":5},{"source":"321cba","target":"qwert43","value":5},{"source":"654321","target":"trewq34","value":5},{"source":"987zxc","target":"123abc","value":5},{"source":"987zxc","target":"trewq34","value":5}]}
