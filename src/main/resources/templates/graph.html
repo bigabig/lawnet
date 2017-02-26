@@ -59,6 +59,7 @@
         .enter().append("circle")
           .attr("r", 5)
           .attr("fill", function(d) { return color(d.group); })
+          .attr("onclick", function(d) { return "testfunction(\""+d.id+"\")"; })
           .call(d3.drag()
               .on("start", dragstarted)
               .on("drag", dragged)
@@ -107,6 +108,10 @@
       if (!d3.event.active) simulation.alphaTarget(0);
       d.fx = null;
       d.fy = null;
+    }
+
+    function testfunction(id) {
+        window.location.href = "/detail?id="+id;
     }
     /*]]>*/
     </script>

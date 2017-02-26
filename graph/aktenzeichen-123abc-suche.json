@@ -1,0 +1,1 @@
+{"nodes":[{"id":"123abc","group":1},{"id":"987zxc","group":2}],"links":[{"source":"987zxc","target":"123abc","value":5}]}
