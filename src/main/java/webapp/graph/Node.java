@@ -5,14 +5,23 @@ package webapp.graph;
  */
 public class Node {
 
+    private String id;
+    private int group;
+    private int size;
+
     public Node(String id, int group)
     {
         this.id = id;
         this.group = group;
+        this.size = 5;
     }
 
-    private String id;
-    private int group;
+    public Node(String id, int group, int size)
+    {
+        this.id = id;
+        this.group = group;
+        this.size = size;
+    }
 
     @Override
     public boolean equals(Object other){
