@@ -1,6 +1,6 @@
 package webapp.controllers;
 
-import com.sun.javafx.runtime.SystemProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,9 +8,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import webapp.converter.ConverterRunnable;
+import webapp.models.DokumentDao;
+import webapp.models.MetadataDao;
+import webapp.models.UserDao;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,8 +25,17 @@ import java.nio.file.Paths;
 @Controller
 public class UploadController {
 
-    //Save the uploaded file to this folder
+    // ------------------------
+    // PRIVATE FIELDS
+    // ------------------------
 
+    @Autowired
+    private DokumentDao dokumentDao;
+
+    @Autowired
+    private MetadataDao metadataDao;
+
+    //Save the uploaded file to this folder
     private static String UPLOADED_FOLDER = System.getProperty("user.home")+"\\Desktop\\Webapp\\Upload\\";
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
@@ -47,6 +59,9 @@ public class UploadController {
             Path path = Paths.get(f.getPath());
 
             Files.write(path, bytes);
+
+            Thread t = new Thread(new ConverterRunnable(f.getPath(), metadataDao, dokumentDao));
+            t.start();
 
         } catch (IOException e) {
             e.printStackTrace();

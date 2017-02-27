@@ -24,7 +24,6 @@ public class Metadata {
 
     // Das Aktenzeichen von einem Beschluss
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private String aktenzeichen;
 
     // Das Datum an von einem Beschluss
@@ -46,6 +45,12 @@ public class Metadata {
     }
 
     public Metadata(String datum, String typ) {
+        this.datum = datum;
+        this.typ = typ;
+    }
+
+    public Metadata(String aktenzeichen, String datum, String typ) {
+        this.aktenzeichen = aktenzeichen;
         this.datum = datum;
         this.typ = typ;
     }

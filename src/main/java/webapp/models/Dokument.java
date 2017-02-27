@@ -16,7 +16,6 @@ public class Dokument {
 
     // Das Aktenzeichen von einem Beschluss
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private String aktenzeichen;
 
     // Der Volltext eines Beschluss
