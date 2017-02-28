@@ -1,16 +1,21 @@
 package webapp.converter;
 
+import com.google.gson.Gson;
+import com.ibm.watson.developer_cloud.alchemy.v1.AlchemyLanguage;
+import com.ibm.watson.developer_cloud.alchemy.v1.model.Entities;
+import com.ibm.watson.developer_cloud.http.ServiceCall;
+import com.ibm.watson.developer_cloud.service.AlchemyService;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import webapp.models.Dokument;
 import webapp.models.DokumentDao;
 import webapp.models.Metadata;
 import webapp.models.MetadataDao;
+import webapp.watson.Response;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by tim on 27.02.2017.
@@ -50,6 +55,22 @@ public class ConverterRunnable implements Runnable {
             // cleanText einlesen
             FileInputStream fis = new FileInputStream(cleanPath);
             String content = IOUtils.toString(fis, "UTF-8");
+
+            // Watson API Initialisierung
+            AlchemyLanguage service = new AlchemyLanguage();
+            service.setApiKey("da7ac0bb06b2486850487c777387f1b7c3f6fe85");
+
+            // Watson API Input
+            Map<String,Object> params = new HashMap<String, Object>();
+            params.put(AlchemyLanguage.TEXT, "IBM Watson won the Jeopardy television show hosted by Alex Trebek");
+
+            // Watson API Call
+            Entities entities = service.getEntities(params).execute();
+            String jsonString = entities.toString();
+
+            Gson gson = new Gson();
+            Response r = gson.fromJson(jsonString, Response.class);
+            System.out.println(r.language +" "+ r.entities[0].text);
 
             // TEXT gegen die Watson API schicken und Metadaten extrahieren
             String aktenzeichen = "testdemo3";
