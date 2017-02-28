@@ -7,8 +7,8 @@
   <artifactId>webapp</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
-  <name>spring-boot-mysql-springdatajpa-hibernate</name>
-  <description>Use Spring Data JPA + Hibernate + MySQL in Spring Boot</description>
+  <name>webapp</name>
+  <description>Awesome Webapp</description>
 
   <parent>
     <groupId>org.springframework.boot</groupId>

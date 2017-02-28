@@ -1,21 +1,14 @@
 package webapp.converter;
 
-import com.google.gson.Gson;
-import com.ibm.watson.developer_cloud.alchemy.v1.AlchemyLanguage;
-import com.ibm.watson.developer_cloud.alchemy.v1.model.Entities;
-import com.ibm.watson.developer_cloud.http.ServiceCall;
-import com.ibm.watson.developer_cloud.service.AlchemyService;
 import org.apache.commons.io.IOUtils;
 import webapp.models.Dokument;
 import webapp.models.DokumentDao;
 import webapp.models.Metadata;
 import webapp.models.MetadataDao;
-import webapp.watson.Response;
+import webapp.models.watson.WatsonHelper;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by tim on 27.02.2017.
@@ -37,9 +30,7 @@ public class ConverterRunnable implements Runnable {
 
     @Override
     public void run() {
-
         try {
-
             // PDF in Text umwandeln
             ProcessBuilder pb = new ProcessBuilder(System.getProperty("user.dir") + "\\helper\\pdftotext.exe", "-enc", "UTF-8", path);
             Process p = pb.start();
@@ -58,31 +49,16 @@ public class ConverterRunnable implements Runnable {
             FileInputStream fis = new FileInputStream(cleanPath);
             String content = IOUtils.toString(fis, "UTF-8");
 
-            // Watson API Initialisierung
-            AlchemyLanguage service = new AlchemyLanguage();
-            service.setApiKey("da7ac0bb06b2486850487c777387f1b7c3f6fe85");
-
-            // Watson API Input
-            Map<String,Object> params = new HashMap<String, Object>();
-            params.put(AlchemyLanguage.TEXT, "IBM Watson won the Jeopardy television show hosted by Alex Trebek");
-
+            WatsonHelper watsonHelper = new WatsonHelper();
             // Watson API Call
-            Entities entities = service.getEntities(params).execute();
-            String jsonString = entities.toString();
+            String jsonString = watsonHelper.findEntities(content);
 
-            Gson gson = new Gson();
-            Response r = gson.fromJson(jsonString, Response.class);
-            System.out.println(r.language +" "+ r.entities[0].text);
+            // Extract Metadata from JSON String
+            Metadata m = watsonHelper.extractMetadata(jsonString, filename);
+            Dokument d = new Dokument(m.getAktenzeichen(), filename, content);
 
-            // TEXT gegen die Watson API schicken und Metadaten extrahieren
-            String aktenzeichen = filename;
-            String datum = "2017-02-27";
-            String typ = "Beschluss";
-
-            Metadata m = new Metadata(aktenzeichen, datum, typ);
+            // Push Data to the Database
             metadataDao.save(m);
-
-            Dokument d = new Dokument(aktenzeichen, filename, content);
             dokumentDao.save(d);
 
             fis.close();

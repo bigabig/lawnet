@@ -1,4 +1,4 @@
-package webapp.watson;
+package webapp.models.watson;
 
 /**
  * Created by tim on 28.02.2017.

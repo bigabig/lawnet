@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<p th:text="'Uploaded, ' + ${filename} + '!'" />
+
+
+<h2>Upload:</h2>
+<form method="post" action="http://localhost:8080/import" enctype="multipart/form-data">
+    <label>Wählen Sie die .txt zum Hochladen aus.
+        <input name="file" type="file" accept="text/plain" />
+    </label>
+    <button>Hochladen</button>
+</form>
+
+</body>
+</html>
