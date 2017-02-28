@@ -22,12 +22,14 @@ import java.util.Map;
  */
 public class ConverterRunnable implements Runnable {
 
+    private String filename;
     private String path;
     private DokumentDao dokumentDao;
     private MetadataDao metadataDao;
 
-    public ConverterRunnable(String path, MetadataDao metadataDao, DokumentDao dokumentDao)
+    public ConverterRunnable(String filename, String path, MetadataDao metadataDao, DokumentDao dokumentDao)
     {
+        this.filename = filename;
         this.path = path;
         this.metadataDao = metadataDao;
         this.dokumentDao = dokumentDao;
@@ -73,14 +75,14 @@ public class ConverterRunnable implements Runnable {
             System.out.println(r.language +" "+ r.entities[0].text);
 
             // TEXT gegen die Watson API schicken und Metadaten extrahieren
-            String aktenzeichen = "testdemo3";
+            String aktenzeichen = filename;
             String datum = "2017-02-27";
             String typ = "Beschluss";
 
             Metadata m = new Metadata(aktenzeichen, datum, typ);
             metadataDao.save(m);
 
-            Dokument d = new Dokument(aktenzeichen, content);
+            Dokument d = new Dokument(aktenzeichen, filename, content);
             dokumentDao.save(d);
 
             fis.close();

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import webapp.converter.ConverterRunnable;
+import webapp.models.Dokument;
 import webapp.models.DokumentDao;
 import webapp.models.MetadataDao;
 
@@ -48,10 +49,18 @@ public class UploadController {
         }
 
         try {
+            String filename = file.getOriginalFilename();
+            System.out.println(filename);
 
-            model.addAttribute("filename", file.getOriginalFilename());
+            Dokument d = dokumentDao.findByDateiname(filename);
+            if(d != null) {
+                model.addAttribute("filename", "Datei ist bereits vorhanden!");
+                return "upload";
+            }
 
-            File f = new File(UPLOADED_FOLDER + file.getOriginalFilename());
+            model.addAttribute("filename", filename);
+
+            File f = new File(UPLOADED_FOLDER + filename);
             f.getParentFile().mkdirs();
 
             byte[] bytes = file.getBytes();
@@ -59,7 +68,7 @@ public class UploadController {
 
             Files.write(path, bytes);
 
-            Thread t = new Thread(new ConverterRunnable(f.getPath(), metadataDao, dokumentDao));
+            Thread t = new Thread(new ConverterRunnable(filename, f.getPath(), metadataDao, dokumentDao));
             t.start();
 
         } catch (IOException e) {
@@ -67,5 +76,5 @@ public class UploadController {
         }
 
         return "upload";
-}
+    }
 }

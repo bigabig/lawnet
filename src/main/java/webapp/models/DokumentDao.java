@@ -16,4 +16,11 @@ public interface DokumentDao extends CrudRepository<Dokument, String> {
      * @param aktenzeichen das aktenzeichen einer Entscheidung.
      */
     public Dokument findByAktenzeichen(String aktenzeichen);
+
+    /**
+     * Gibt das vollständige Dokument (Volltext) zum Dateinamen einer Entscheidung zurück.
+     *
+     * @param dateiname der Dateiname einer Entscheidung.
+     */
+    public Dokument findByDateiname(String dateiname);
 }

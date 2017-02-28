@@ -18,6 +18,10 @@ public class Dokument {
     @Id
     private String aktenzeichen;
 
+    // Der Dateiname von einer Entscheidung-Datei
+    @NotNull
+    private String dateiname;
+
     // Der Volltext eines Beschluss
     @NotNull
     private String text;
@@ -26,14 +30,20 @@ public class Dokument {
     // PUBLIC METHODS
     // ------------------------
 
-    public Dokument() { }
+    public Dokument() {};
 
-    public Dokument(String text) {
-        this.text = text;
+    public Dokument(String aktenzeichen) {
+        this.aktenzeichen = aktenzeichen;
     }
 
     public Dokument(String aktenzeichen, String text) {
         this.aktenzeichen = aktenzeichen;
+        this.text = text;
+    }
+
+    public Dokument(String aktenzeichen, String dateiname, String text) {
+        this.aktenzeichen = aktenzeichen;
+        this.dateiname = dateiname;
         this.text = text;
     }
 
@@ -49,8 +59,10 @@ public class Dokument {
 
     public String getText() { return text; }
 
-    public void setText(String value) {
-        this.text = value;
-    }
+    public void setText(String value) { this.text = value; }
+
+    public String getDateiname() { return dateiname; }
+
+    public void setDateiname(String value) { this.dateiname = value; }
 
 } //class Dokument
