@@ -27,7 +27,6 @@ public class Metadata {
     private String aktenzeichen;
 
     // Das Datum an von einem Beschluss
-    @NotNull
     private String datum;
 
     // Der Typ eines Beschluss

@@ -56,7 +56,7 @@ public class GraphController {
         if(!aktenzeichen.equals("")) {
             meta = new ArrayList<Metadata>();
             meta.add(metadataDao.findByAktenzeichen(aktenzeichen));
-            filename = "aktenzeichen-"+aktenzeichen+"-suche.json";
+            filename = "aktenzeichen-"+aktenzeichen.replace(":","_")+"-suche.json";
         } else if(!datum.equals("") && !typ.equals("")) {
             meta = metadataDao.findByDatumAndTyp(datum, typ);
             filename = "datumtyp-"+datum+typ+"-suche.json";
@@ -93,7 +93,7 @@ public class GraphController {
         List<Node> nodes = new ArrayList<>();
         List<Link> links = new ArrayList<>();
         for(Metadata m : meta) {
-            Node n = new Node(m.getAktenzeichen(), 1);
+            Node n = new Node(m.getAktenzeichen(), getColor(m.getTyp()), 7);
             nodes.add(n);
         }
 
@@ -118,7 +118,7 @@ public class GraphController {
                     }
 
                     if(metadata != null) {
-                        Node node = new Node(metadata.getAktenzeichen(), 2);
+                        Node node = new Node(metadata.getAktenzeichen(), getColor(metadata.getTyp()), 4);
                         if(!nodes.contains(node))
                             nodes.add(node);
                     }
@@ -144,5 +144,19 @@ public class GraphController {
         } catch (IOException ex) {
             System.out.println(ex.toString());
         }
+    }
+
+    private int getColor(String typ) {
+        switch(typ) {
+            case "Urteil":
+                return 1;
+            case "Beschluss":
+                return 2;
+            case "Verweis":
+                return 3;
+            case "Norm":
+                return 4;
+        }
+        return 0;
     }
 }

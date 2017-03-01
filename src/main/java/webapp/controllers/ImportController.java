@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import webapp.importer.ImportRunnable;
 import webapp.models.DokumentDao;
 import webapp.models.MetadataDao;
+import webapp.models.ZitatDao;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,9 @@ public class ImportController {
     @Autowired
     private DokumentDao dokumentDao;
 
+    @Autowired
+    private ZitatDao zitatDao;
+
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     public String singleFileUpload(@RequestParam("file") MultipartFile file,
                                    RedirectAttributes redirectAttributes, Model model) {
@@ -52,7 +56,7 @@ public class ImportController {
 
             Files.write(path, bytes);
 
-            Thread t = new Thread(new ImportRunnable(f.getPath(), metadataDao, dokumentDao));
+            Thread t = new Thread(new ImportRunnable(f.getPath(), metadataDao, dokumentDao, zitatDao));
             t.run();
 
         } catch (IOException e) {

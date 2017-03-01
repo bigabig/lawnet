@@ -9,6 +9,12 @@ public class Node {
     private int group;
     private int size;
 
+    public Node(String id) {
+        this.id = id;
+        this.group = 0;
+        this.size = 5;
+    }
+
     public Node(String id, int group)
     {
         this.id = id;
@@ -31,5 +37,7 @@ public class Node {
         Node otherNode = (Node) other;
         return (this.id == otherNode.id);
     }
+
+    public void setGroup(int value) { this.group = value; }
 
 }

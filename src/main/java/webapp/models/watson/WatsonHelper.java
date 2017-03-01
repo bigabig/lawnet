@@ -7,9 +7,7 @@ import webapp.models.Metadata;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by tim on 28.02.2017.
@@ -51,18 +49,36 @@ public class WatsonHelper {
                 aktenzeichen = e.getText();
             }
             if(e.getType().equals("Entscheidungsart") && (e.getText().equals("URTEIL") || e.getText().equals("BESCHLUSS"))) {
-                typ = e.getText();
+                String string = e.getText().toLowerCase();
+                typ = Character.toUpperCase(string.charAt(0)) + string.substring(1, string.length());
             }
             if(e.getType().equals("Datum")) {
                 String string = e.getText();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-M-yyyy", Locale.GERMAN);
                 LocalDate date = LocalDate.parse(string, formatter);
-                System.out.println(date); // 2010-01-02
                 if(datum == null || datum.isBefore(date))
                     datum = date;
             }
         }
 
         return new Metadata(aktenzeichen, datum.toString(), typ);
+    }
+
+    public List<Metadata> extractVerweis(String jsonString) {
+        Gson gson = new Gson();
+        Response r = gson.fromJson(jsonString, Response.class);
+
+        List<Metadata> result = new ArrayList<>();
+
+        for(Entity e: r.entities) {
+            if(e.getType().equals("Verweis") || e.getType().equals("Norm")) {
+                Metadata m = new Metadata();
+                m.setAktenzeichen(e.getText());
+                m.setTyp(e.getType());
+                result.add(m);
+            }
+        }
+
+        return result;
     }
 }

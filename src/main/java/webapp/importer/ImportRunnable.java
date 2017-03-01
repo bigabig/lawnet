@@ -1,10 +1,7 @@
 package webapp.importer;
 
 import org.apache.commons.io.IOUtils;
-import webapp.models.Dokument;
-import webapp.models.DokumentDao;
-import webapp.models.Metadata;
-import webapp.models.MetadataDao;
+import webapp.models.*;
 
 import webapp.models.watson.WatsonHelper;
 
@@ -22,11 +19,13 @@ public class ImportRunnable implements Runnable {
     private List<String> files;
     private MetadataDao metadataDao;
     private DokumentDao dokumentDao;
+    private ZitatDao zitatDao;
 
-    public ImportRunnable(String path, MetadataDao metadataDao, DokumentDao dokumentDao) {
+    public ImportRunnable(String path, MetadataDao metadataDao, DokumentDao dokumentDao, ZitatDao zitatDao) {
         this.files = new FileList(path).getFileList();
         this.metadataDao = metadataDao;
         this.dokumentDao = dokumentDao;
+        this.zitatDao = zitatDao;
     }
 
     @Override
@@ -53,9 +52,15 @@ public class ImportRunnable implements Runnable {
             // Extract Metadata from JSON String
             Metadata m = watsonHelper.extractMetadata(jsonString, filename);
             Dokument d = new Dokument(m.getAktenzeichen(), filename, content);
+            List<Metadata> verweise = watsonHelper.extractVerweis(jsonString);
 
             metadataDao.save(m);
             dokumentDao.save(d);
+            for(Metadata meta : verweise) {
+                metadataDao.save(meta);
+                Zitat z = new Zitat(m.getAktenzeichen(), meta.getAktenzeichen());
+                zitatDao.save(z);
+            }
         }
 
     }

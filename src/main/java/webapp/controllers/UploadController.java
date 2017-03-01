@@ -12,6 +12,7 @@ import webapp.converter.ConverterRunnable;
 import webapp.models.Dokument;
 import webapp.models.DokumentDao;
 import webapp.models.MetadataDao;
+import webapp.models.ZitatDao;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +35,9 @@ public class UploadController {
 
     @Autowired
     private MetadataDao metadataDao;
+
+    @Autowired
+    private ZitatDao zitatDao;
 
     //Save the uploaded file to this folder
     private static String UPLOADED_FOLDER = System.getProperty("user.home")+"\\Desktop\\Webapp\\Upload\\";
@@ -68,7 +72,7 @@ public class UploadController {
 
             Files.write(path, bytes);
 
-            Thread t = new Thread(new ConverterRunnable(filename, f.getPath(), metadataDao, dokumentDao));
+            Thread t = new Thread(new ConverterRunnable(filename, f.getPath(), metadataDao, dokumentDao, zitatDao));
             t.start();
 
         } catch (IOException e) {
