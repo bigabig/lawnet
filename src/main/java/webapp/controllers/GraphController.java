@@ -5,14 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import webapp.graph.Draw;
 import webapp.graph.Link;
 import webapp.graph.Node;
-import webapp.models.Metadata;
-import webapp.models.MetadataDao;
-import webapp.models.Zitat;
-import webapp.models.ZitatDao;
+import webapp.models.*;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -36,12 +34,16 @@ public class GraphController {
     private MetadataDao metadataDao;
 
     @Autowired
+    private DokumentDao dokumentDao;
+
+    @Autowired
     private ZitatDao zitatDao;
 
-    private static String GRAPH_FOLDER = System.getProperty("user.dir")+"\\graph\\";
+    private static String GRAPH_FOLDER = System.getProperty("user.dir")+"\\graphen\\";
 
     @RequestMapping("/graph")
-    public String find(@RequestParam(value="aktenzeichen", required=false, defaultValue="") String aktenzeichen,
+    public String find(@RequestParam(value="filename", required=false, defaultValue="") String dateiname,
+                       @RequestParam(value="aktenzeichen", required=false, defaultValue="") String aktenzeichen,
                        @RequestParam(value="datum", required=false, defaultValue="") String datum,
                        @RequestParam(value="typ", required=false, defaultValue="") String typ,
                        @RequestParam(value="zitat", required=false, defaultValue="active") String zitat, Model model) {
@@ -53,7 +55,14 @@ public class GraphController {
         // MySQL-Abfrage abhängig vom Request
         List<Metadata> meta = null;
 
-        if(!aktenzeichen.equals("")) {
+        if (!dateiname.equals("")) {
+            Dokument d = dokumentDao.findByDateiname(dateiname);
+            meta = new ArrayList<Metadata>();
+            meta.add(metadataDao.findByAktenzeichen(d.getAktenzeichen()));
+            filename = "dateiname-+"+dateiname+"-suche.json";
+        } else if (aktenzeichen.equals("") && datum.equals("") && typ.equals("")) {
+            return "graph";
+        } else if(!aktenzeichen.equals("")) {
             meta = new ArrayList<Metadata>();
             meta.add(metadataDao.findByAktenzeichen(aktenzeichen));
             filename = "aktenzeichen-"+aktenzeichen.replace(":","_")+"-suche.json";

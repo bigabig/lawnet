@@ -47,8 +47,7 @@ public class UploadController {
                                    RedirectAttributes redirectAttributes, Model model) {
 
         if (file.isEmpty()) {
-            redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
-            model.addAttribute("filename","Fehlgeschlagen");
+            model.addAttribute("message","Upload fehlgeschlagen!");
             return "upload";
         }
 
@@ -58,7 +57,8 @@ public class UploadController {
 
             Dokument d = dokumentDao.findByDateiname(filename);
             if(d != null) {
-                model.addAttribute("filename", "Datei ist bereits vorhanden!");
+                model.addAttribute("message", "Datei ist bereits vorhanden!");
+                model.addAttribute("filename", filename);
                 return "upload";
             }
 
@@ -81,4 +81,10 @@ public class UploadController {
 
         return "upload";
     }
+
+    @RequestMapping(value = "/upload")
+    public String index(Model model) {
+        return "upload";
+    }
+
 }

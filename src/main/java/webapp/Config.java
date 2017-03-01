@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class Config extends WebMvcConfigurerAdapter {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/graph/**").addResourceLocations("file:" + Application.GRAPH_DIR);
+        registry.addResourceHandler("/graphen/**").addResourceLocations("file:" + Application.GRAPH_DIR);
         super.addResourceHandlers(registry);
     }
 }

@@ -19,7 +19,7 @@ public class Application extends SpringBootServletInitializer {
 
   public static void main(String[] args) {
     try {
-      GRAPH_DIR = new File(".").getCanonicalPath() + "/graph/";
+      GRAPH_DIR = new File(".").getCanonicalPath() + "/graphen/";
       SpringApplication.run(Application.class, args);
     } catch (Exception e) {
 

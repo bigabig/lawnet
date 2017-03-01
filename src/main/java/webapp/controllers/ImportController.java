@@ -41,7 +41,7 @@ public class ImportController {
     public String singleFileUpload(@RequestParam("file") MultipartFile file,
                                    RedirectAttributes redirectAttributes, Model model) {
         if (file.isEmpty()) {
-            model.addAttribute("filename","Fehlgeschlagen");
+            model.addAttribute("messsage","Fehlgeschlagen!");
             return "import";
         }
 
@@ -63,12 +63,12 @@ public class ImportController {
             e.printStackTrace();
         }
 
+        model.addAttribute("message", "Import erfolgreich!");
         return "import";
     }
 
     @RequestMapping(value = "/import")
     public String index(Model model) {
-        model.addAttribute("filename","Kein Upload");
         return "import";
     }
 
