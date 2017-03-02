@@ -59,7 +59,7 @@ public class GraphController {
             Dokument d = dokumentDao.findByDateiname(dateiname);
             meta = new ArrayList<Metadata>();
             meta.add(metadataDao.findByAktenzeichen(d.getAktenzeichen()));
-            filename = "dateiname-+"+dateiname+"-suche.json";
+            filename = "dateiname-"+dateiname+"-suche.json";
         } else if (aktenzeichen.equals("") && datum.equals("") && typ.equals("")) {
             return "graph";
         } else if(!aktenzeichen.equals("")) {

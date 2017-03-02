@@ -43,9 +43,6 @@ public class DeleteController {
         List<String> messages = new ArrayList<>();
 
         if(aktenzeichen.equals("")) {
-            messages.add("Test1");
-            messages.add("Test2");
-            model.addAttribute("messages", messages);
             return "delete";
         }
 

@@ -1,0 +1,232 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css"></link>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway"></link>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
+    <style>
+        html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+    </style>
+    <style>
+    #links polyline {
+      stroke: #999;
+      stroke-opacity: 0.6;
+      marker-mid: url(#arrow);
+    }
+
+    svg path {
+        stroke: #999;
+        stroke-opacity: 1;
+        stroke-linejoin: round;
+        fill:none;
+    }
+
+    #nodes circle {
+      stroke: #fff;
+      stroke-width: 1.5px;
+    }
+    </style>
+    <title>Graph</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body class="w3-light-grey">
+<!-- Top container -->
+<div class="w3-container w3-top w3-white w3-large w3-padding" style="z-index:4">
+    <button class="w3-button w3-hide-large w3-padding-0 w3-black w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i></button>
+    <img src="http://www.law-school.de/fileadmin/site/common/Resources/Public/Images/logo-bucerius-law-school.svg" alt="Bucerius Law School"></img>
+    <span style=" font-size: 20px; margin-left: 30px;">Super-Tool</span>
+</div>
+
+<!-- Sidenav/menu -->
+<nav class="w3-sidenav w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidenav">
+    <div class="w3-container">
+        <h5>Functions</h5>
+    </div>
+    <a href="#" class="w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
+    <a href="/graph" class="w3-padding w3-blue"><i class="fa fa-search fa-fw"></i>  Suchen</a>
+    <a href="/upload" class="w3-padding"><i class="fa fa-upload fa-fw"></i>  Upload</a>
+    <a href="/import" class="w3-padding"><i class="fa fa-files-o fa-fw"></i>  Import</a>
+    <a href="/delete" class="w3-padding"><i class="fa fa-trash fa-fw"></i>  Löschen</a>
+</nav>
+
+
+<!-- Overlay effect when opening sidenav on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+
+    <div class="w3-container w3-section">
+        <div class="w3-row-padding" style="margin:0 -16px">
+            <div class="w3-twothird">
+                <h5 th:text="'Graph - '+${message}"></h5>
+                <svg width="960" height="600" >
+                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="2" refY="2" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L4,2 0,4"></path>
+                    </marker>
+                    <rect id="background" width="100%" height="100%" fill="white" pointer-events="all" />
+                    <g id="root">
+                        <g id="links"></g>
+                        <g id="nodes"></g>
+                    </g>
+                </svg>
+                <div id="menu">
+                    <button onclick="force.stop()">Freeze</button>
+                    <button onclick="force.resume()">Thaw</button>
+                    <button onclick="force.stop(); zoomFit(0.95, 500)">Fit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr></hr>
+
+    <!-- Footer -->
+    <footer class="w3-container w3-padding-16 w3-light-grey">
+        <h4>FOOTER</h4>
+        <p>Developed by Tim Fischer &amp; Bobby Wu</p>
+    </footer>
+    <!-- End page content -->
+</div>
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script th:inline="javascript">
+    var zoom = d3.behavior
+        .zoom()
+        .scaleExtent([1/4, 4])
+        .on('zoom.zoom', function () {
+            console.trace("zoom", d3.event.translate, d3.event.scale);
+            root.attr('transform',
+                'translate(' + d3.event.translate + ')'
+                +   'scale(' + d3.event.scale     + ')');
+        })
+    ;
+
+    var svg = d3
+        .select('svg')
+        .call(zoom);
+
+    var svg = d3.select("svg"),
+        width = +svg.attr("width"),
+        height = +svg.attr("height");
+
+        console.log(svg);
+
+    var root = svg.select('#root');
+    var node_group = svg.select('#nodes');
+    var link_group = svg.select('#links');
+
+    /*var color = d3.scaleOrdinal(d3.schemeCategory20);*/
+
+    var color = d3.scaleLinear()
+        .domain([0, 1, 2, 3, 4])
+        .range(["white", "blue", "green", "orange", "yellow"]);
+
+    var simulation = d3.forceSimulation()
+        .force("link", d3.forceLink().id(function(d) { return d.id; }))
+        .force("charge", d3.forceManyBody())
+        .force("center", d3.forceCenter(width / 2, height / 2));
+
+    var dateiname = 'typ-beschluss-suche.json'
+    d3.json("http://localhost:8080/graphen/"+dateiname, function(error, graph) {
+      if (error) throw error;
+
+      var link = link_group
+        .selectAll("polyline")
+        .data(graph.links)
+        .enter().append("polyline")
+          .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+
+      var node = node_group
+        .selectAll("circle")
+        .data(graph.nodes)
+        .enter().append("circle")
+          .attr("r", function(d) { return d.size; })
+          .attr("fill", function(d) { return color(d.group); })
+          .attr("onclick", function(d) { return "testfunction(\""+d.id+"\")"; })
+          .call(d3.drag()
+              .on("start", dragstarted)
+              .on("drag", dragged)
+              .on("end", dragended));
+
+      node.append("title")
+          .text(function(d) { return d.id; });
+
+      simulation
+          .nodes(graph.nodes)
+          .on("tick", ticked);
+
+      simulation.force("link")
+          .links(graph.links);
+
+      function ticked() {
+        link
+            .attr("points", function(d) {
+                var x1 = d.source.x;
+                var y1 = d.source.y;
+                var x3 = d.target.x;
+                var y3 = d.target.y;
+                var x2 = x1 + 0.5 * (x3 - x1);
+                var y2 = y1 + 0.5 * (y3 - y1);
+                return x1+","+y1+" "+x2+","+y2+" "+x3+","+y3;
+            });
+
+        node
+            .attr("cx", function(d) { return d.x; })
+            .attr("cy", function(d) { return d.y; });
+      }
+    });
+
+    function dragstarted(d) {
+      if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+
+    function dragged(d) {
+      d.fx = d3.event.x;
+      d.fy = d3.event.y;
+    }
+
+    function dragended(d) {
+      if (!d3.event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }
+
+    function testfunction(id) {
+        window.location.href = "/detail?id="+id;
+    }
+
+    var force = d3.layout
+		.force();
+
+    function lapsedZoomFit(ticks, transitionDuration) {
+        for (var i = ticks || 200; i > 0; --i) force.tick();
+        force.stop();
+        zoomFit(undefined, transitionDuration);
+    }
+
+    function zoomFit(paddingPercent, transitionDuration) {
+        var bounds = root.node().getBBox();
+        var parent = root.node().parentElement;
+        var fullWidth = parent.clientWidth,
+            fullHeight = parent.clientHeight;
+        var width = bounds.width,
+            height = bounds.height;
+        var midX = bounds.x + width / 2,
+            midY = bounds.y + height / 2;
+        if (width == 0 || height == 0) return; // nothing to fit
+        var scale = (paddingPercent || 0.75) / Math.max(width / fullWidth, height / fullHeight);
+        var translate = [fullWidth / 2 - scale * midX, fullHeight / 2 - scale * midY];
+
+        console.trace("zoomFit", translate, scale);
+        root
+            .transition()
+            .duration(transitionDuration || 0) // milliseconds
+            .call(zoom.translate(translate).scale(scale).event);
+    }
+    </script>
+</body>
+</html>
