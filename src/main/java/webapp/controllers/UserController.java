@@ -47,7 +47,7 @@ public class UserController {
    * @param id The id of the user to delete
    * @return A string describing if the user is succesfully deleted or not.
    */
-  @RequestMapping("/delete")
+  @RequestMapping("/deleteold")
   @ResponseBody
   public String delete(long id) {
     try {

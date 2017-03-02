@@ -28,6 +28,7 @@
     <a href="/graph" class="w3-padding"><i class="fa fa-search fa-fw"></i>  Suchen</a>
     <a href="/upload" class="w3-padding"><i class="fa fa-upload fa-fw"></i>  Upload</a>
     <a href="/import" class="w3-padding"><i class="fa fa-files-o fa-fw"></i>  Import</a>
+    <a href="/delete" class="w3-padding"><i class="fa fa-trash fa-fw"></i>  Löschen</a>
 </nav>
 
 
@@ -37,7 +38,10 @@
 <!-- !PAGE CONTENT! -->
 <div class="w3-main" style="margin-left:300px;margin-top:43px;">
 
-    <div class="w3-container" style="padding-top:22px">
+    <div th:if="${message != null }" class="w3-container" style="padding-top:22px">
+        <p th:text="${message}" />
+    </div>
+    <div th:if="${aktenzeichen != null }" class="w3-container" style="padding-top:22px">
         <h3 th:text="${aktenzeichen}"></h3>
         <p th:text="'Aktenzeichen: ' + ${aktenzeichen}" />
         <p th:text="'Datum: ' + ${datum}" />

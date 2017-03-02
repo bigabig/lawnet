@@ -47,6 +47,7 @@
         <a href="/graph" class="w3-padding w3-blue"><i class="fa fa-search fa-fw"></i>  Suchen</a>
         <a href="/upload" class="w3-padding"><i class="fa fa-upload fa-fw"></i>  Upload</a>
         <a href="/import" class="w3-padding"><i class="fa fa-files-o fa-fw"></i>  Import</a>
+        <a href="/delete" class="w3-padding"><i class="fa fa-trash fa-fw"></i>  Löschen</a>
     </nav>
 
 
@@ -87,7 +88,7 @@
         <div class="w3-container w3-section">
             <div class="w3-row-padding" style="margin:0 -16px">
                 <div class="w3-twothird">
-                    <h5>Graph</h5>
+                    <h5 th:text="'Graph - '+${message}"></h5>
                     <svg width="960" height="600" >
                         <marker id="arrow" markerWidth="10" markerHeight="10" refX="2" refY="2" orient="auto" markerUnits="strokeWidth">
                             <path d="M0,0 L4,2 0,4"></path>
@@ -156,7 +157,11 @@
         width = +svg.attr("width"),
         height = +svg.attr("height");
 
-    var color = d3.scaleOrdinal(d3.schemeCategory20);
+    /*var color = d3.scaleOrdinal(d3.schemeCategory20);*/
+
+    var color = d3.scaleLinear()
+        .domain([0, 1, 2, 3, 4])
+        .range(["white", "blue", "green", "orange", "yellow"]);
 
     var simulation = d3.forceSimulation()
         .force("link", d3.forceLink().id(function(d) { return d.id; }))

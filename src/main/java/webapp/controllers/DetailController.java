@@ -42,6 +42,11 @@ public class DetailController {
         Metadata metadata = metadataDao.findByAktenzeichen(aktenzeichen);
         Dokument dokument = dokumentDao.findByAktenzeichen(aktenzeichen);
 
+        if(metadata == null || dokument == null) {
+            model.addAttribute("message", "Kein Volltext zu diesem Eintrag vorhanden!");
+            return "detail";
+        }
+
         // Daten an das Template übergeben
         model.addAttribute("aktenzeichen", metadata.getAktenzeichen());
         model.addAttribute("datum", metadata.getDatum());

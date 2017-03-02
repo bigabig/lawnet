@@ -27,8 +27,8 @@
     <a href="#" class="w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
     <a href="/graph" class="w3-padding"><i class="fa fa-search fa-fw"></i>  Suchen</a>
     <a href="/upload" class="w3-padding"><i class="fa fa-upload fa-fw"></i>  Upload</a>
-    <a href="/import" class="w3-padding  w3-blue"><i class="fa fa-files-o fa-fw"></i>  Import</a>
-    <a href="/delete" class="w3-padding"><i class="fa fa-trash fa-fw"></i>  Löschen</a>
+    <a href="/import" class="w3-padding"><i class="fa fa-files-o fa-fw"></i>  Import</a>
+    <a href="/delete" class="w3-padding  w3-blue"><i class="fa fa-trash fa-fw"></i>  Löschen</a>
 </nav>
 
 
@@ -40,14 +40,19 @@
 
     <div class="w3-container" style="padding-top:22px">
         <h5>Input</h5>
-        <form method="post" action="http://localhost:8080/import" enctype="multipart/form-data">
-            <label>Wählen Sie die .txt zum Hochladen aus.
-                <input name="file" type="file" accept="text/plain" />
+        <form action="http://localhost:8080/delete" method="get">
+            <label>Aktenzeichen
+                <input type="text" name="aktenzeichen"></input>
             </label>
-            <button>Hochladen</button>
+            <input type="submit" value="Löschen!"></input>
         </form>
         <div th:if="${message != null }">
             <p th:text="${message}" />
+        </div>
+        <div th:if="${messages != null }">
+            <ul>
+                <li th:each="msg : ${messages}" th:text="${msg}"></li>
+            </ul>
         </div>
     </div>
 
