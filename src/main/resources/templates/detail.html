@@ -39,14 +39,16 @@
 <div class="w3-main" style="margin-left:300px;margin-top:43px;">
 
     <div th:if="${message != null }" class="w3-container" style="padding-top:22px">
+        <h3 th:text="${aktenzeichen}"></h3>
         <p th:text="${message}" />
     </div>
-    <div th:if="${aktenzeichen != null }" class="w3-container" style="padding-top:22px">
+    <div th:if="${message == null }" class="w3-container" style="padding-top:22px">
         <h3 th:text="${aktenzeichen}"></h3>
         <p th:text="'Aktenzeichen: ' + ${aktenzeichen}" />
         <p th:text="'Datum: ' + ${datum}" />
         <p th:text="'Typ: ' + ${typ}" />
-        <p th:text="'Text: ' + ${text}" />
+        <pre style="white-space: pre-wrap;" th:text="${text}"></pre>
+
     </div>
 
     <hr></hr>

@@ -78,4 +78,13 @@ public class Metadata {
         this.typ = value;
     }
 
-} // class User
+    @Override
+    public boolean equals(Object other){
+        if (other == null) return false;
+        if (other == this) return true;
+        if (!(other instanceof Metadata)) return false;
+        Metadata otherMetadata = (Metadata) other;
+        return (this.aktenzeichen.equals(otherMetadata.getAktenzeichen()));
+    }
+
+} // class Metadata

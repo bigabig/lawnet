@@ -43,6 +43,7 @@ public class DetailController {
         Dokument dokument = dokumentDao.findByAktenzeichen(aktenzeichen);
 
         if(metadata == null || dokument == null) {
+            model.addAttribute("aktenzeichen", aktenzeichen);
             model.addAttribute("message", "Kein Volltext zu diesem Eintrag vorhanden!");
             return "detail";
         }

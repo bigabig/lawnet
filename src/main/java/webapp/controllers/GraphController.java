@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.thymeleaf.util.ListUtils;
 import webapp.graph.Draw;
 import webapp.graph.Link;
 import webapp.graph.Node;
@@ -49,22 +50,26 @@ public class GraphController {
                        @RequestParam(value="zitat", required=false, defaultValue="active") String zitat, Model model) {
 
         String message = "Aktenzeichen: "+aktenzeichen+"\nDatum: "+datum+"\nTyp: "+typ+"\nZitat: "+zitat;
+        model.addAttribute("message", message);
         System.out.println(message);
-        String filename;
+        String filename = "";
 
         // MySQL-Abfrage abhängig vom Request
         List<Metadata> meta = null;
 
-        if (!dateiname.equals("")) {
+        if(dateiname.equals("") && aktenzeichen.equals("") && datum.equals("") && typ.equals("") ) {
+            return "graph";
+        } else if (!dateiname.equals("")) {
             Dokument d = dokumentDao.findByDateiname(dateiname);
             meta = new ArrayList<Metadata>();
-            meta.add(metadataDao.findByAktenzeichen(d.getAktenzeichen()));
+            Metadata m = metadataDao.findByAktenzeichen(d.getAktenzeichen());
+            if(m != null)
+                meta.add(m);
             filename = "dateiname-"+dateiname+"-suche.json";
-        } else if (aktenzeichen.equals("") && datum.equals("") && typ.equals("")) {
+        } else if (aktenzeichen.equals("") && datum.equals("") && typ.equals("") ) {
             return "graph";
         } else if(!aktenzeichen.equals("")) {
-            meta = new ArrayList<Metadata>();
-            meta.add(metadataDao.findByAktenzeichen(aktenzeichen));
+            meta = metadataDao.findByAktenzeichenStartingWith(aktenzeichen);
             filename = "aktenzeichen-"+aktenzeichen.replace(":","_")+"-suche.json";
         } else if(!datum.equals("") && !typ.equals("")) {
             meta = metadataDao.findByDatumAndTyp(datum, typ);
@@ -75,29 +80,30 @@ public class GraphController {
         } else if(!typ.equals("")) {
             meta = metadataDao.findByTyp(typ);
             filename = "typ-"+typ+"-suche.json";
-        } else {
-            return "error";
         }
 
-        if(meta == null || !(zitat.equals("active") | zitat.equals("passiv"))) {
-            return "error";
+        if(meta == null || meta.isEmpty() || !(zitat.equals("active") || zitat.equals("passiv"))) {
+            model.addAttribute("fehler", "Zu dieser Suchanfrage gibt es leider keine Ergebnisse!");
+            return "graph";
         }
 
         // Metadaten nach JSON-String umwandeln
-        String data = metaToJSON(meta, zitat);
+        String data = metaToJSON(meta, zitat, model);
 
         // JSON-String als JSON-Datei abspeichern
         saveJSONFile(filename, data);
 
         // Übergeben des Filenames an Template
         model.addAttribute("filename", filename);
-        model.addAttribute("message", message);
 
         // Darstellung der JSON-Datei als Graph
         return "graph";
     }
 
-    private String metaToJSON(List<Metadata> meta, String zitat) {
+    private String metaToJSON(List<Metadata> meta, String zitat, Model model) {
+        List<Metadata> metaStatistik = new ArrayList<>();
+        metaStatistik.addAll(meta);
+
         // Umwandlung der MySQL-Anfrage in JSON
         List<Node> nodes = new ArrayList<>();
         List<Link> links = new ArrayList<>();
@@ -108,32 +114,44 @@ public class GraphController {
 
         for(Metadata m : meta) {
             List<Zitat> zitate = null;
-            if(zitat.equals("active")) {
+            if (zitat.equals("active")) {
                 zitate = zitatDao.findByAktenzeichen1(m.getAktenzeichen());
             } else if (zitat.equals("passiv")) {
                 zitate = zitatDao.findByAktenzeichen2(m.getAktenzeichen());
             }
 
-            if(zitate != null) {
-                for(Zitat z : zitate) {
+            if (zitate != null) {
+                for (Zitat z : zitate) {
                     Link l = new Link(z.getAktenzeichen1(), z.getAktenzeichen2(), 5);
                     links.add(l);
 
                     Metadata metadata = null;
-                    if(zitat.equals("active")) {
+                    if (zitat.equals("active")) {
                         metadata = metadataDao.findByAktenzeichen(z.getAktenzeichen2());
-                    } else if(zitat.equals("passiv")) {
+                    } else if (zitat.equals("passiv")) {
                         metadata = metadataDao.findByAktenzeichen(z.getAktenzeichen1());
                     }
 
-                    if(metadata != null) {
+                    if (metadata != null) {
+                        metaStatistik.add(metadata);
                         Node node = new Node(metadata.getAktenzeichen(), getColor(metadata.getTyp()), 4);
-                        if(!nodes.contains(node))
+                        if (!nodes.contains(node))
                             nodes.add(node);
                     }
                 }
             }
         }
+
+        Metadata[] statistik =  test(metaStatistik);
+        List<String> result = new ArrayList<>();
+        for(Metadata stat : statistik) {
+            if(stat != null) {
+                result.add("Top " + stat.getTyp() + ": " + stat.getAktenzeichen());
+            }
+        }
+
+        model.addAttribute("statistik", result);
+
         Draw d = new Draw(nodes, links);
 
         Gson g = new Gson();
@@ -167,5 +185,56 @@ public class GraphController {
                 return 4;
         }
         return 0;
+    }
+
+    private Metadata[] test(List<Metadata> meta) {
+        Metadata[] top = new Metadata[4]; // Urteil = 0, Beschluss = 1, Verweis = 2, Norm = 3
+
+        int tu = 0;
+        int tb = 0;
+        int tv = 0;
+        int tn = 0;
+
+        for(Metadata m : meta) {
+            List<Zitat> zitierungen = zitatDao.findByAktenzeichen2(m.getAktenzeichen());
+            int anzahl = 0;
+
+            for(Zitat z : zitierungen) {
+                Metadata lel = metadataDao.findByAktenzeichen(z.getAktenzeichen1());
+                if(meta.contains(lel))
+                    anzahl = anzahl + 1;
+            }
+
+            if(anzahl < 2)
+                continue;
+            switch(m.getTyp()) {
+                case "Urteil":
+                    if(anzahl > tu) {
+                        tu = anzahl;
+                        top[0] = m;
+                    }
+                    break;
+                case "Beschluss":
+                    if(anzahl > tb) {
+                        tb = anzahl;
+                        top[1] = m;
+                    }
+                    break;
+                case "Verweis":
+                    if(anzahl > tv) {
+                        tv = anzahl;
+                        top[2] = m;
+                    }
+                    break;
+                case "Norm":
+                    if(anzahl > tn) {
+                        tn = anzahl;
+                        top[3] = m;
+                    }
+                    break;
+            }
+        }
+
+        return top;
     }
 }

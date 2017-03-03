@@ -92,6 +92,8 @@
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script th:inline="javascript">
+    /*<![CDATA[*/
+
     var zoom = d3.behavior
         .zoom()
         .scaleExtent([1/4, 4])
@@ -128,7 +130,7 @@
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(width / 2, height / 2));
 
-    var dateiname = 'typ-beschluss-suche.json'
+    var dateiname = [[${filename}]]
     d3.json("http://localhost:8080/graphen/"+dateiname, function(error, graph) {
       if (error) throw error;
 
@@ -227,6 +229,7 @@
             .duration(transitionDuration || 0) // milliseconds
             .call(zoom.translate(translate).scale(scale).event);
     }
+    /*]]>*/
     </script>
 </body>
 </html>

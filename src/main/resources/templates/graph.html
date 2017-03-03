@@ -9,7 +9,7 @@
         html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
     </style>
     <style>
-    .links polyline {
+    #links polyline {
       stroke: #999;
       stroke-opacity: 0.6;
       marker-mid: url(#arrow);
@@ -22,9 +22,17 @@
         fill:none;
     }
 
-    .nodes circle {
+    #nodes circle {
       stroke: #fff;
       stroke-width: 1.5px;
+    }
+
+     .circle {
+      width: 20px;
+      height: 20px;
+      -webkit-border-radius: 10px;
+      -moz-border-radius: 10px;
+      border-radius: 10px;
     }
     </style>
     <title>Graph</title>
@@ -89,51 +97,55 @@
             <div class="w3-row-padding" style="margin:0 -16px">
                 <div class="w3-twothird">
                     <h5 th:text="'Graph - '+${message}"></h5>
-                    <svg width="960" height="600" >
-                        <marker id="arrow" markerWidth="10" markerHeight="10" refX="2" refY="2" orient="auto" markerUnits="strokeWidth">
-                            <path d="M0,0 L4,2 0,4"></path>
-                        </marker>
-                    </svg>
+                    <div th:if="${fehler} != null">
+                        <p th:text="${fehler}"></p>
+                    </div>
+                    <div th:if="${fehler} == null">
+                        <svg width="930" height="600" >
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="2" refY="2" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L4,2 0,4"></path>
+                            </marker>
+                            <rect id="background" width="100%" height="100%" fill="white" pointer-events="all" />
+                            <g id="root">
+                                <g id="links"></g>
+                                <g id="nodes"></g>
+                            </g>
+                        </svg>
+                        <div id="menu">
+                            <button onclick="force.stop(); zoomFit(0.95, 500)">Fit</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="w3-third">
                     <h5>Statistics</h5>
                     <table class="w3-table w3-striped w3-white">
+                        <tr th:each="stat : ${statistik}">
+                            <td th:text="${stat}"></td>
+                        </tr>
+                    </table>
+
+                    <br/>
+
+                    <h5>Legende</h5>
+                    <table class="w3-table w3-striped w3-white">
                         <tr>
-                            <td><i class="fa fa-user w3-blue w3-padding-tiny"></i></td>
-                            <td>New record, over 90 views.</td>
-                            <td><i>10 mins</i></td>
+                            <td><div class="circle" style="background: #0174DF;"></div></td>
+                            <td>Urteil</td>
                         </tr>
                         <tr>
-                            <td><i class="fa fa-bell w3-red w3-padding-tiny"></i></td>
-                            <td>Database error.</td>
-                            <td><i>15 mins</i></td>
+                            <td><div class="circle" style="background: #04B404;"></div></td>
+                            <td>Beschluss</td>
                         </tr>
                         <tr>
-                            <td><i class="fa fa-users w3-orange w3-text-white w3-padding-tiny"></i></td>
-                            <td>New record, over 40 users.</td>
-                            <td><i>17 mins</i></td>
+                            <td><div class="circle" style="background: #DF7401;"></div></td>
+                            <td>Verweis</td>
                         </tr>
                         <tr>
-                            <td><i class="fa fa-comment w3-red w3-padding-tiny"></i></td>
-                            <td>New comments.</td>
-                            <td><i>25 mins</i></td>
+                            <td><div class="circle" style="background: #FFBF00;"></div></td>
+                            <td>Norm</td>
                         </tr>
-                        <tr>
-                            <td><i class="fa fa-bookmark w3-light-blue w3-padding-tiny"></i></td>
-                            <td>Check transactions.</td>
-                            <td><i>28 mins</i></td>
-                        </tr>
-                        <tr>
-                            <td><i class="fa fa-laptop w3-red w3-padding-tiny"></i></td>
-                            <td>CPU overload.</td>
-                            <td><i>35 mins</i></td>
-                        </tr>
-                        <tr>
-                            <td><i class="fa fa-share-alt w3-green w3-padding-tiny"></i></td>
-                            <td>New shares.</td>
-                        <td><i>39 mins</i></td>
-                    </tr>
-                </table>
+                    </table>
+
             </div>
         </div>
     </div>
@@ -149,19 +161,41 @@
 
 
 
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script th:inline="javascript">
     /*<![CDATA[*/
+
+    var zoom = d3.behavior
+        .zoom()
+        .scaleExtent([1/4, 4])
+        .on('zoom.zoom', function () {
+            console.trace("zoom", d3.event.translate, d3.event.scale);
+            root.attr('transform',
+                'translate(' + d3.event.translate + ')'
+                +   'scale(' + d3.event.scale     + ')');
+        })
+    ;
+
+    var svg = d3
+        .select('svg')
+        .call(zoom);
 
     var svg = d3.select("svg"),
         width = +svg.attr("width"),
         height = +svg.attr("height");
 
+        console.log(svg);
+
+    var root = svg.select('#root');
+    var node_group = svg.select('#nodes');
+    var link_group = svg.select('#links');
+
     /*var color = d3.scaleOrdinal(d3.schemeCategory20);*/
 
     var color = d3.scaleLinear()
         .domain([0, 1, 2, 3, 4])
-        .range(["white", "blue", "green", "orange", "yellow"]);
+        .range(["white", "#0174DF", "#04B404", "#DF7401", "#FFBF00"]);
 
     var simulation = d3.forceSimulation()
         .force("link", d3.forceLink().id(function(d) { return d.id; }))
@@ -172,15 +206,13 @@
     d3.json("http://localhost:8080/graphen/"+dateiname, function(error, graph) {
       if (error) throw error;
 
-      var link = svg.append("g")
-          .attr("class", "links")
+      var link = link_group
         .selectAll("polyline")
         .data(graph.links)
         .enter().append("polyline")
           .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
 
-      var node = svg.append("g")
-          .attr("class", "nodes")
+      var node = node_group
         .selectAll("circle")
         .data(graph.nodes)
         .enter().append("circle")
@@ -239,6 +271,35 @@
 
     function testfunction(id) {
         window.location.href = "/detail?id="+id;
+    }
+
+    var force = d3.layout
+		.force();
+
+    function lapsedZoomFit(ticks, transitionDuration) {
+        for (var i = ticks || 200; i > 0; --i) force.tick();
+        force.stop();
+        zoomFit(undefined, transitionDuration);
+    }
+
+    function zoomFit(paddingPercent, transitionDuration) {
+        var bounds = root.node().getBBox();
+        var parent = root.node().parentElement;
+        var fullWidth = parent.clientWidth,
+            fullHeight = parent.clientHeight;
+        var width = bounds.width,
+            height = bounds.height;
+        var midX = bounds.x + width / 2,
+            midY = bounds.y + height / 2;
+        if (width == 0 || height == 0) return; // nothing to fit
+        var scale = (paddingPercent || 0.75) / Math.max(width / fullWidth, height / fullHeight);
+        var translate = [fullWidth / 2 - scale * midX, fullHeight / 2 - scale * midY];
+
+        console.trace("zoomFit", translate, scale);
+        root
+            .transition()
+            .duration(transitionDuration || 0) // milliseconds
+            .call(zoom.translate(translate).scale(scale).event);
     }
     /*]]>*/
     </script>
