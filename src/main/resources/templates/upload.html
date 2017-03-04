@@ -15,7 +15,7 @@
 <!-- Top container -->
 <div class="w3-container w3-top w3-white w3-large w3-padding" style="z-index:4">
     <button class="w3-button w3-hide-large w3-padding-0 w3-black w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i></button>
-    <img src="http://localhost:8080/img/logo.svg" alt="Bucerius Law School" height="60px"></img>
+    <img src="img/logo.svg" alt="Bucerius Law School" height="60px"></img>
     <span style=" font-size: 20px; margin-left: 45px;">Super-Tool</span>
 </div>
 
@@ -25,10 +25,10 @@
         <h5>Functions</h5>
     </div>
     <a href="#" class="w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
-    <a href="/graph" class="w3-padding"><i class="fa fa-search fa-fw"></i>  Suchen</a>
-    <a href="/upload" class="w3-padding w3-blue"><i class="fa fa-upload fa-fw"></i>  Upload</a>
-    <a href="/import" class="w3-padding"><i class="fa fa-files-o fa-fw"></i>  Import</a>
-    <a href="/delete" class="w3-padding"><i class="fa fa-trash fa-fw"></i>  Löschen</a>
+    <a href="graph" class="w3-padding"><i class="fa fa-search fa-fw"></i>  Suchen</a>
+    <a href="upload" class="w3-padding w3-blue"><i class="fa fa-upload fa-fw"></i>  Upload</a>
+    <a href="import" class="w3-padding"><i class="fa fa-files-o fa-fw"></i>  Import</a>
+    <a href="delete" class="w3-padding"><i class="fa fa-trash fa-fw"></i>  Löschen</a>
 </nav>
 
 
@@ -40,7 +40,7 @@
 
     <div class="w3-container" style="padding-top:22px">
         <h5>Input</h5>
-        <form method="post" action="http://localhost:8080/upload" enctype="multipart/form-data">
+        <form method="post" action="upload" enctype="multipart/form-data">
             <label>Wählen Sie eine PDF-Datei (*.pdf) von Ihrem Rechner aus.
                 <input name="file" type="file" accept="application/pdf/*"></input>
             </label>

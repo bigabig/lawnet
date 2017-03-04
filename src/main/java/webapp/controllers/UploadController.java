@@ -40,7 +40,17 @@ public class UploadController {
     private ZitatDao zitatDao;
 
     //Save the uploaded file to this folder
-    private static String UPLOADED_FOLDER = System.getProperty("user.home")+"\\Desktop\\Webapp\\Upload\\";
+    //private static String UPLOADED_FOLDER = System.getProperty("user.home")+"\\Desktop\\Webapp\\Upload\\";
+    private static File UPLOADED_FOLDER;
+
+    static{
+        try {
+            UPLOADED_FOLDER = new File(File.createTempFile("deleteme", "").getParent(), "lawnet-upload");
+            UPLOADED_FOLDER.mkdir();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String singleFileUpload(@RequestParam("file") MultipartFile file,
@@ -64,7 +74,7 @@ public class UploadController {
 
             model.addAttribute("filename", filename);
 
-            File f = new File(UPLOADED_FOLDER + filename);
+            File f = new File(UPLOADED_FOLDER, filename);
             f.getParentFile().mkdirs();
 
             byte[] bytes = file.getBytes();

@@ -1,5 +1,7 @@
 package webapp.models;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
@@ -24,6 +26,7 @@ public class Dokument {
 
     // Der Volltext eines Beschluss
     @NotNull
+    @Type(type="text")
     private String text;
 
     // ------------------------

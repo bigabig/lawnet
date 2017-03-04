@@ -42,7 +42,7 @@
     <!-- Top container -->
     <div class="w3-container w3-top w3-white w3-large w3-padding" style="z-index:4">
         <button class="w3-button w3-hide-large w3-padding-0 w3-black w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i></button>
-        <img src="http://localhost:8080/img/logo.svg" alt="Bucerius Law School" height="60px"></img>
+        <img src="img/logo.svg" alt="Bucerius Law School" height="60px"></img>
         <span style=" font-size: 20px; margin-left: 45px;">Super-Tool</span>
     </div>
 
@@ -52,10 +52,10 @@
             <h5>Functions</h5>
         </div>
         <a href="#" class="w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
-        <a href="/graph" class="w3-padding w3-blue"><i class="fa fa-search fa-fw"></i>  Suchen</a>
-        <a href="/upload" class="w3-padding"><i class="fa fa-upload fa-fw"></i>  Upload</a>
-        <a href="/import" class="w3-padding"><i class="fa fa-files-o fa-fw"></i>  Import</a>
-        <a href="/delete" class="w3-padding"><i class="fa fa-trash fa-fw"></i>  Löschen</a>
+        <a href="graph" class="w3-padding w3-blue"><i class="fa fa-search fa-fw"></i>  Suchen</a>
+        <a href="upload" class="w3-padding"><i class="fa fa-upload fa-fw"></i>  Upload</a>
+        <a href="import" class="w3-padding"><i class="fa fa-files-o fa-fw"></i>  Import</a>
+        <a href="delete" class="w3-padding"><i class="fa fa-trash fa-fw"></i>  Löschen</a>
     </nav>
 
 
@@ -68,26 +68,34 @@
         <div class="w3-container" style="padding-top:22px">
             <h5>Input</h5>
 
-            <form action="http://localhost:8080/graph" method="get">
+            <form action="graph" method="get">
                 <label>Aktenzeichen
-                    <input type="text" name="aktenzeichen"></input>
+                    <input type="text" name="aktenzeichen" th:value="${aktenzeichen}"></input>
                 </label>
                 <label>Datum
-                    <input type="date" name="datum" value="2017-02-01" min="2015-01-01" max="2018-01-01"></input>
+                    <input type="date" name="datum" th:value="${datum}" min="2015-01-01" max="2018-01-01"></input>
                 </label>
                 <label>Typ:
                     <select name="typ" size="1">
                         <option value="">Alle Typen</option>
-                        <option value="urteil">Urteil</option>
-                        <option value="beschluss">Beschluss</option>
-                        <option value="verweis">Verweis</option>
-                        <option value="norm">Norm</option>
+                        <option th:if="${typ.equals('urteil')}" selected="selected" value="urteil">Urteil</option>
+                        <option th:if="${!typ.equals('urteil')}" value="urteil">Urteil</option>
+                        <option th:if="${typ.equals('beschluss')}" selected="selected" value="beschluss">Beschluss</option>
+                        <option th:if="${!typ.equals('beschluss')}" value="beschluss">Beschluss</option>
+                        <option th:if="${typ.equals('verweis')}" selected="selected" value="verweis">Verweis</option>
+                        <option th:if="${!typ.equals('verweis')}" value="verweis">Verweis</option>
+                        <option th:if="${typ.equals('norm')}" selected="selected" value="norm">Norm</option>
+                        <option th:if="${!typ.equals('norm')}" value="norm">Norm</option>
                     </select>
                 </label>
                 <label>Zitierung:
                     <select name="zitat" size="1">
-                        <option value="active">Aktiv</option>
-                        <option value="passiv">Passiv</option>
+                        <option th:if="${zitat.equals('active')}" selected="selected" value="active">Aktiv</option>
+                        <option th:if="${!zitat.equals('active')}" value="active">Aktiv</option>
+                        <option th:if="${zitat.equals('passiv')}" selected="selected" value="passiv">Passiv</option>
+                        <option th:if="${!zitat.equals('passiv')}" value="passiv">Passiv</option>
+                        <option th:if="${zitat.equals('actpas')}" selected="selected" value="actpas">Aktiv &amp; Passiv</option>
+                        <option th:if="${!zitat.equals('actpas')}" value="actpas">Aktiv &amp; Passiv</option>
                     </select>
                 </label>
                 <input type="submit" value="Suchen!"></input>
@@ -205,7 +213,7 @@
         .force("center", d3.forceCenter(width / 2, height / 2));
 
     var dateiname = [[${filename}]]
-    d3.json("http://localhost:8080/graphen/"+dateiname, function(error, graph) {
+    d3.json("graphen/"+dateiname, function(error, graph) {
       if (error) throw error;
 
       var link = link_group
@@ -272,7 +280,7 @@
     }
 
     function testfunction(id) {
-        window.location.href = "/detail?id="+id;
+        window.location.href = "detail?id="+id;
     }
 
     var force = d3.layout

@@ -32,7 +32,8 @@ public class ConverterRunnable implements Runnable {
     public void run() {
         try {
             // PDF in Text umwandeln
-            ProcessBuilder pb = new ProcessBuilder(System.getProperty("user.dir") + "\\helper\\pdftotext.exe", "-enc", "UTF-8", path);
+            // ProcessBuilder pb = new ProcessBuilder(System.getProperty("user.dir") + "\\helper\\pdftotext.exe", "-enc", "UTF-8", path);
+            ProcessBuilder pb = new ProcessBuilder("pdftotext", "-enc", "UTF-8", path);
             Process p = pb.start();
             p.waitFor();
 
@@ -40,9 +41,10 @@ public class ConverterRunnable implements Runnable {
             String cleanPath = textPath.replace(".txt", "_clean.txt");
 
             // Text in cleanText umwandeln
-            pb = new ProcessBuilder("java", "-jar", System.getProperty("user.dir")+"\\helper\\converter.jar", textPath, cleanPath, System.getProperty("user.dir")+"\\helper\\shortcuts.txt");
-            p = pb.start();
-            p.waitFor();
+            //pb = new ProcessBuilder("java", "-jar", System.getProperty("user.dir")+"\\helper\\converter.jar", textPath, cleanPath, System.getProperty("user.dir")+"\\helper\\shortcuts.txt");
+            //p = pb.start();
+            //p.waitFor();
+            ConverterMain.main(new String[]{textPath, cleanPath });
 
             // cleanText einlesen
             FileInputStream fis = new FileInputStream(cleanPath);

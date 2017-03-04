@@ -5,6 +5,7 @@ import webapp.models.*;
 
 import webapp.models.watson.WatsonHelper;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.List;
  */
 public class ImportRunnable implements Runnable {
 
-    private static String FILE_FOLDER = System.getProperty("user.home")+"\\Desktop\\Webapp\\Files\\";
+    private static String FILE_FOLDER = new File(System.getProperty("user.home"), "files").getAbsolutePath();
     private List<String> files;
     private MetadataDao metadataDao;
     private DokumentDao dokumentDao;
@@ -36,7 +37,7 @@ public class ImportRunnable implements Runnable {
             FileInputStream fis = null;
             String content = null;
             try {
-                fis = new FileInputStream(FILE_FOLDER + filename);
+                fis = new FileInputStream(new File(FILE_FOLDER, filename));
                 content = IOUtils.toString(fis, "UTF-8");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

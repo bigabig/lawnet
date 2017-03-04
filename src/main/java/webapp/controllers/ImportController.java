@@ -26,7 +26,16 @@ import java.nio.file.Paths;
 public class ImportController {
 
     //Save the uploaded file to this folder
-    private static String UPLOADED_FOLDER = System.getProperty("user.home")+"\\Desktop\\Webapp\\Import\\";
+    private static File UPLOADED_FOLDER;
+
+    static{
+        try {
+            UPLOADED_FOLDER = new File(File.createTempFile("deleteme", "").getParent(), "lawnet-import");
+            UPLOADED_FOLDER.mkdir();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Autowired
     private MetadataDao metadataDao;
@@ -48,7 +57,7 @@ public class ImportController {
         try {
             String filename = file.getOriginalFilename();
 
-            File f = new File(UPLOADED_FOLDER + filename);
+            File f = new File(UPLOADED_FOLDER, filename);
             f.getParentFile().mkdirs();
 
             byte[] bytes = file.getBytes();

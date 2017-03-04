@@ -13,6 +13,8 @@ import webapp.graph.Link;
 import webapp.graph.Node;
 import webapp.models.*;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,6 +34,9 @@ public class GraphController {
     // ------------------------
 
     @Autowired
+    private ServletContext servletContext;
+
+    @Autowired
     private MetadataDao metadataDao;
 
     @Autowired
@@ -40,7 +45,7 @@ public class GraphController {
     @Autowired
     private ZitatDao zitatDao;
 
-    private static String GRAPH_FOLDER = System.getProperty("user.dir")+"\\graphen\\";
+    // private static String GRAPH_FOLDER = System.getProperty("user.dir")+"\\graphen\\";
 
     @RequestMapping("/graph")
     public String find(@RequestParam(value="filename", required=false, defaultValue="") String dateiname,
@@ -50,6 +55,10 @@ public class GraphController {
                        @RequestParam(value="zitat", required=false, defaultValue="active") String zitat, Model model) {
 
         String message = "Aktenzeichen: "+aktenzeichen+"\nDatum: "+datum+"\nTyp: "+typ+"\nZitat: "+zitat;
+        model.addAttribute("aktenzeichen", aktenzeichen);
+        model.addAttribute("datum", datum);
+        model.addAttribute("typ", typ);
+        model.addAttribute("zitat", zitat);
         model.addAttribute("message", message);
         System.out.println(message);
         String filename = "";
@@ -114,7 +123,10 @@ public class GraphController {
 
         for(Metadata m : meta) {
             List<Zitat> zitate = null;
-            if (zitat.equals("active")) {
+            if (zitat.equals("actpas")) {
+                zitate = zitatDao.findByAktenzeichen1(m.getAktenzeichen());
+                zitate.addAll(zitatDao.findByAktenzeichen2(m.getAktenzeichen()));
+            } else if (zitat.equals("active")) {
                 zitate = zitatDao.findByAktenzeichen1(m.getAktenzeichen());
             } else if (zitat.equals("passiv")) {
                 zitate = zitatDao.findByAktenzeichen2(m.getAktenzeichen());
@@ -160,7 +172,7 @@ public class GraphController {
 
     private void saveJSONFile(String filename, String jsonString) {
         // Speicherort für das Ergebnis (JSON Datei)
-        File f = new File(GRAPH_FOLDER + filename);
+        File f = new File(servletContext.getRealPath("graphen"), filename);
         f.getParentFile().mkdirs();
 
         // Schreiben des Ergebnis nach /graph
