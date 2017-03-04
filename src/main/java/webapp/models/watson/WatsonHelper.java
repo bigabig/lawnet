@@ -54,9 +54,15 @@ public class WatsonHelper {
             }
             if(e.getType().equals("Datum")) {
                 String string = e.getText();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-M-yyyy", Locale.GERMAN);
-                LocalDate date = LocalDate.parse(string, formatter);
-                if(datum == null || datum.isBefore(date))
+                LocalDate date = null;
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-M-yyyy", Locale.GERMAN);
+                    date = LocalDate.parse(string, formatter);
+                } catch (Exception ex) {
+                    ex.printStackTrace();;
+                    continue;
+                }
+                if(date != null && (datum == null || datum.isBefore(date)))
                     datum = date;
             }
         }

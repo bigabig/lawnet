@@ -8,16 +8,12 @@ import javax.persistence.Table;
 /**
  * Created by tim on 28.02.2017.
  */
-@javax.persistence.Entity
-@Table(name = "entities")
 public class Entity {
 
     // ------------------------
     // PRIVATE FIELDS
     // ------------------------
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     private int count;

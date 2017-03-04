@@ -91,7 +91,7 @@ public class GraphController {
             filename = "typ-"+typ+"-suche.json";
         }
 
-        if(meta == null || meta.isEmpty() || !(zitat.equals("active") || zitat.equals("passiv"))) {
+        if(meta == null || meta.isEmpty() || !(zitat.equals("active") || zitat.equals("passiv") || zitat.equals("actpas"))) {
             model.addAttribute("fehler", "Zu dieser Suchanfrage gibt es leider keine Ergebnisse!");
             return "graph";
         }
@@ -117,7 +117,7 @@ public class GraphController {
         List<Node> nodes = new ArrayList<>();
         List<Link> links = new ArrayList<>();
         for(Metadata m : meta) {
-            Node n = new Node(m.getAktenzeichen(), getColor(m.getTyp()), 7);
+            Node n = new Node(m.getAktenzeichen().toLowerCase(), getColor(m.getTyp()), 7);
             nodes.add(n);
         }
 
@@ -134,21 +134,40 @@ public class GraphController {
 
             if (zitate != null) {
                 for (Zitat z : zitate) {
-                    Link l = new Link(z.getAktenzeichen1(), z.getAktenzeichen2(), 5);
+                    Link l = new Link(z.getAktenzeichen1().toLowerCase(), z.getAktenzeichen2().toLowerCase(), 5);
                     links.add(l);
 
-                    Metadata metadata = null;
-                    if (zitat.equals("active")) {
-                        metadata = metadataDao.findByAktenzeichen(z.getAktenzeichen2());
-                    } else if (zitat.equals("passiv")) {
-                        metadata = metadataDao.findByAktenzeichen(z.getAktenzeichen1());
-                    }
+                    if(zitat.equals("active") || zitat.equals("passiv")) {
+                        Metadata metadata = null;
+                        if (zitat.equals("active")) {
+                            metadata = metadataDao.findByAktenzeichen(z.getAktenzeichen2());
+                        } else if (zitat.equals("passiv")) {
+                            metadata = metadataDao.findByAktenzeichen(z.getAktenzeichen1());
+                        }
 
-                    if (metadata != null) {
-                        metaStatistik.add(metadata);
-                        Node node = new Node(metadata.getAktenzeichen(), getColor(metadata.getTyp()), 4);
-                        if (!nodes.contains(node))
-                            nodes.add(node);
+                        if (metadata != null) {
+                            metaStatistik.add(metadata);
+                            Node node = new Node(metadata.getAktenzeichen().toLowerCase(), getColor(metadata.getTyp()), 4);
+                            if (!nodes.contains(node))
+                                nodes.add(node);
+                        }
+                    } else if (zitat.equals("actpas")) {
+                        Metadata metadata1 = metadataDao.findByAktenzeichen(z.getAktenzeichen2());
+                        Metadata metadata2 = metadataDao.findByAktenzeichen(z.getAktenzeichen1());
+
+                        if (metadata1 != null) {
+                            metaStatistik.add(metadata1);
+                            Node node = new Node(metadata1.getAktenzeichen().toLowerCase(), getColor(metadata1.getTyp()), 4);
+                            if (!nodes.contains(node))
+                                nodes.add(node);
+                        }
+
+                        if (metadata2 != null) {
+                            metaStatistik.add(metadata2);
+                            Node node = new Node(metadata2.getAktenzeichen().toLowerCase(), getColor(metadata2.getTyp()), 4);
+                            if (!nodes.contains(node))
+                                nodes.add(node);
+                        }
                     }
                 }
             }
@@ -174,6 +193,7 @@ public class GraphController {
         // Speicherort für das Ergebnis (JSON Datei)
         File f = new File(servletContext.getRealPath("graphen"), filename);
         f.getParentFile().mkdirs();
+        System.out.println(f.getAbsolutePath());
 
         // Schreiben des Ergebnis nach /graph
         try {

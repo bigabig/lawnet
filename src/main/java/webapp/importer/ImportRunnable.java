@@ -41,8 +41,14 @@ public class ImportRunnable implements Runnable {
                 content = IOUtils.toString(fis, "UTF-8");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+                continue;
             } catch (IOException e) {
                 e.printStackTrace();
+                continue;
+            }
+
+            if(content == null) {
+                continue;
             }
 
             WatsonHelper watsonHelper = new WatsonHelper();

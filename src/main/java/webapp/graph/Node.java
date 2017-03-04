@@ -35,7 +35,7 @@ public class Node {
         if (other == this) return true;
         if (!(other instanceof Node))return false;
         Node otherNode = (Node) other;
-        return (this.id == otherNode.id);
+        return (this.id.equals(otherNode.id));
     }
 
     public void setGroup(int value) { this.group = value; }
