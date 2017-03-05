@@ -5,12 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.thymeleaf.util.ListUtils;
 import webapp.graph.Draw;
 import webapp.graph.Link;
 import webapp.graph.Node;
 import webapp.models.*;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.FileWriter;
@@ -19,11 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 /**
  * Created by tim on 23.02.2017.
  */
+/*
 @Controller
-public class GraphController {
+public class GraphControllerOLD {
 
     // ------------------------
     // PRIVATE FIELDS
@@ -60,8 +65,8 @@ public class GraphController {
         String filename = "";
 
         // MySQL-Abfrage abhängig vom Request
-        // Generierung des Dateinamens abhängig vom Request
         List<Metadata> meta = null;
+
         if(dateiname.equals("") && aktenzeichen.equals("") && datum.equals("") && typ.equals("") ) {
             return "graph";
         } else if (!dateiname.equals("")) {
@@ -92,13 +97,8 @@ public class GraphController {
             return "graph";
         }
 
-        List<Metadata> allMetadata = findAllMetadata(meta, zitat);
-
         // Metadaten nach JSON-String umwandeln
-        String data = metaToJSON(allMetadata, zitat);
-
-        // Statistik erheben
-        model.addAttribute("statistik", makeStatistic(allMetadata));
+        String data = metaToJSON(meta, zitat, model);
 
         // JSON-String als JSON-Datei abspeichern
         saveJSONFile(filename, data);
@@ -110,61 +110,71 @@ public class GraphController {
         return "graph";
     }
 
+    private String metaToJSON(List<Metadata> meta, String zitat, Model model) {
+        List<Metadata> metaStatistik = new ArrayList<>();
+        metaStatistik.addAll(meta);
 
-    // ALL METADATA
-
-    private List<Zitat> getZitate(Metadata metadata, String zitat) {
-        List<Zitat> zitate = null;
-        if (zitat.equals("actpas")) {
-            zitate = zitatDao.findByAktenzeichen1(metadata.getAktenzeichen());
-            zitate.addAll(zitatDao.findByAktenzeichen2(metadata.getAktenzeichen()));
-        } else if (zitat.equals("active")) {
-            zitate = zitatDao.findByAktenzeichen1(metadata.getAktenzeichen());
-        } else if (zitat.equals("passiv")) {
-            zitate = zitatDao.findByAktenzeichen2(metadata.getAktenzeichen());
+        // Umwandlung der MySQL-Anfrage in JSON
+        List<Node> nodes = new ArrayList<>();
+        List<Link> links = new ArrayList<>();
+        for(Metadata m : meta) {
+            Node n = new Node(m.getAktenzeichen().toLowerCase(), getColor(m.getTyp()), 7);
+            nodes.add(n);
         }
-        return zitate;
-    }
-
-    private List<Metadata> findAllMetadata(List<Metadata> meta, String zitat)  {
-        List<Metadata> result = new ArrayList<>();
-        result.addAll(meta);
 
         for(Metadata m : meta) {
+            List<Zitat> zitate = null;
+            if (zitat.equals("actpas")) {
+                zitate = zitatDao.findByAktenzeichen1(m.getAktenzeichen());
+                zitate.addAll(zitatDao.findByAktenzeichen2(m.getAktenzeichen()));
+            } else if (zitat.equals("active")) {
+                zitate = zitatDao.findByAktenzeichen1(m.getAktenzeichen());
+            } else if (zitat.equals("passiv")) {
+                zitate = zitatDao.findByAktenzeichen2(m.getAktenzeichen());
+            }
 
-            List<Zitat> zitate = getZitate(m, zitat);
-            if(zitate == null)
-                continue;
+            if (zitate != null) {
+                for (Zitat z : zitate) {
+                    Link l = new Link(z.getAktenzeichen1().toLowerCase(), z.getAktenzeichen2().toLowerCase(), 5);
+                    links.add(l);
 
-            for(Zitat z : zitate) {
+                    if(zitat.equals("active") || zitat.equals("passiv")) {
+                        Metadata metadata = null;
+                        if (zitat.equals("active")) {
+                            metadata = metadataDao.findByAktenzeichen(z.getAktenzeichen2());
+                        } else if (zitat.equals("passiv")) {
+                            metadata = metadataDao.findByAktenzeichen(z.getAktenzeichen1());
+                        }
 
-                Metadata[] newMeta = new Metadata[2];
-                if (zitat.equals("actpas")) {
-                    newMeta[0] = metadataDao.findByAktenzeichen(z.getAktenzeichen2());
-                    newMeta[1] = metadataDao.findByAktenzeichen(z.getAktenzeichen1());
-                } else if (zitat.equals("active")) {
-                    newMeta[0] = metadataDao.findByAktenzeichen(z.getAktenzeichen2());
-                } else if (zitat.equals("passiv")) {
-                    newMeta[0] = metadataDao.findByAktenzeichen(z.getAktenzeichen1());
-                }
+                        if (metadata != null) {
+                            metaStatistik.add(metadata);
+                            Node node = new Node(metadata.getAktenzeichen().toLowerCase(), getColor(metadata.getTyp()), 4);
+                            if (!nodes.contains(node))
+                                nodes.add(node);
+                        }
+                    } else if (zitat.equals("actpas")) {
+                        Metadata metadata1 = metadataDao.findByAktenzeichen(z.getAktenzeichen2());
+                        Metadata metadata2 = metadataDao.findByAktenzeichen(z.getAktenzeichen1());
 
-                for(Metadata nw : newMeta) {
-                    if (nw == null)
-                        continue;
+                        if (metadata1 != null) {
+                            metaStatistik.add(metadata1);
+                            Node node = new Node(metadata1.getAktenzeichen().toLowerCase(), getColor(metadata1.getTyp()), 4);
+                            if (!nodes.contains(node))
+                                nodes.add(node);
+                        }
 
-                    if(!result.contains(nw))
-                        result.add(nw);
+                        if (metadata2 != null) {
+                            metaStatistik.add(metadata2);
+                            Node node = new Node(metadata2.getAktenzeichen().toLowerCase(), getColor(metadata2.getTyp()), 4);
+                            if (!nodes.contains(node))
+                                nodes.add(node);
+                        }
+                    }
                 }
             }
         }
-        return result;
-    }
 
-    // STATISTICS
-
-    private List<String> makeStatistic(List<Metadata> allMetadata) {
-        Metadata[] statistik =  test(allMetadata);
-
+        Metadata[] statistik =  test(metaStatistik);
         List<String> result = new ArrayList<>();
         for(Metadata stat : statistik) {
             if(stat != null) {
@@ -172,26 +182,10 @@ public class GraphController {
             }
         }
 
-        return result;
-    }
+        model.addAttribute("statistik", result);
 
-    private String metaToJSON(List<Metadata> allMetadata, String zitat) {
-        List<Node> nodes = new ArrayList<>();
-        List<Link> links = new ArrayList<>();
-
-        for(Metadata m : allMetadata) {
-            Node n = new Node(m.getAktenzeichen().toLowerCase(), getColor(m.getTyp()), 5);
-            nodes.add(n);
-
-            List<Zitat> zitate = zitatDao.findByAktenzeichen1(m.getAktenzeichen());
-            for(Zitat z : zitate) {
-                if(allMetadata.contains(new Metadata(z.getAktenzeichen2()))) {
-                    Link l = new Link(z.getAktenzeichen1().toLowerCase(), z.getAktenzeichen2().toLowerCase(), 5);
-                    links.add(l);
-                }
-            }
-        }
         Draw d = new Draw(nodes, links);
+
         Gson g = new Gson();
         return g.toJson(d);
     }
@@ -276,5 +270,5 @@ public class GraphController {
 
         return top;
     }
-
 }
+*/
