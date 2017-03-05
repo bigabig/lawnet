@@ -95,7 +95,7 @@ public class GraphController {
         List<Metadata> allMetadata = findAllMetadata(meta, zitat);
 
         // Metadaten nach JSON-String umwandeln
-        String data = metaToJSON(allMetadata, zitat);
+        String data = metaToJSON(meta, allMetadata, zitat);
 
         // Statistik erheben
         model.addAttribute("statistik", makeStatistic(allMetadata));
@@ -175,12 +175,16 @@ public class GraphController {
         return result;
     }
 
-    private String metaToJSON(List<Metadata> allMetadata, String zitat) {
+    private String metaToJSON(List<Metadata> meta, List<Metadata> allMetadata, String zitat) {
         List<Node> nodes = new ArrayList<>();
         List<Link> links = new ArrayList<>();
 
         for(Metadata m : allMetadata) {
-            Node n = new Node(m.getAktenzeichen().toLowerCase(), getColor(m.getTyp()), 5);
+            Node n = null;
+            if(meta.contains(m))
+                n = new Node(m.getAktenzeichen().toLowerCase(), getColor(m.getTyp()), 7);
+            else
+                n = new Node(m.getAktenzeichen().toLowerCase(), getColor(m.getTyp()), 4);
             nodes.add(n);
 
             List<Zitat> zitate = zitatDao.findByAktenzeichen1(m.getAktenzeichen());
