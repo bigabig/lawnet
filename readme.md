@@ -10,9 +10,8 @@
 
 Öffnen Sie die 'application.properties' Datei und setzen Sie ihre eigenen Werte
 
-default DBUSER: dbuser1
-
-default DBPASS: letmein
+- default DBUSER: dbuser1
+- default DBPASS: letmein
 
 #### Vom Terminal starten
 
