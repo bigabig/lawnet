@@ -37,13 +37,14 @@ Import as *Existing Maven Project* and run it as *Spring Boot App*.
 #### Suchen
 Hier können Sie die Dokumente in der Datenbank durchsuchen und deren Beziehungen als gerichteten Graphen ausgeben lassen.
 Ihnen stehen als Kriterien Aktenzeichen, Datum, Typ und Zitierungsweise zur Verfügung.
-    * Aktenzeichen: Hier können sie ein bestimmtes Aktenzeichen eingeben, oder ein partielles Aktenzeichen, sodass mehrere gefunden werden können.
-      Achtung: Bei der Suche nach dem Aktenzeichen werden weitere Kriterien ignoriert!
-    * Datum: beschränkt die Suche auf ein konkretes Datum
-    * Typ:  beschränkt die Suche auf einen konkreten Typ
-    * Zitierung: hier haben sie die Auswahl zwischen aktiv, passiv und aktiv&passiv.
-        * "aktiv" findet zusätzlich zu den Dokumenten A, die die Suchkriterien erfüllen, alle weiteren Dokumente B, die diese zitieren. Es gilt "A zitiert B".
-        * "passiv" findet zusätzlich zu den Dokumenten A, die die Suchkriterien erfüllen, alle weiteren Dokumente B, welche diese zitieren. Es gilt "B zitiert A"
+
+- Aktenzeichen: Hier können sie ein bestimmtes Aktenzeichen eingeben, oder ein partielles Aktenzeichen, sodass mehrere gefunden werden können.
+- Achtung: Bei der Suche nach dem Aktenzeichen werden weitere Kriterien ignoriert!
+- Datum: beschränkt die Suche auf ein konkretes Datum
+- Typ:  beschränkt die Suche auf einen konkreten Typ
+- Zitierung: hier haben sie die Auswahl zwischen aktiv, passiv und aktiv&passiv.
+    * "aktiv" findet zusätzlich zu den Dokumenten A, die die Suchkriterien erfüllen, alle weiteren Dokumente B, die diese zitieren. Es gilt "A zitiert B".
+    * "passiv" findet zusätzlich zu den Dokumenten A, die die Suchkriterien erfüllen, alle weiteren Dokumente B, welche diese zitieren. Es gilt "B zitiert A"
 
 Hinweis: Sie können auf den Knoten eines Graphen klicken, um an den Volltext und die Metadaten des entsprechenden Dokumentes zu gelangen.
 
