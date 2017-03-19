@@ -1,8 +1,5 @@
 ## Lawnet Dokumentation
 
-See here for more informations:
-http://blog.webapp.com/2014/10/27/using-mysql-in-spring-boot-via-spring-data-jpa-and-hibernate/
-
 ### Applikation Starten
 
 #### Voraussetzungen
