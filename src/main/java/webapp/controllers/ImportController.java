@@ -49,6 +49,8 @@ public class ImportController {
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     public String singleFileUpload(@RequestParam("file") MultipartFile file,
                                    RedirectAttributes redirectAttributes, Model model) {
+        model.addAttribute("module", "import");
+
         if (file.isEmpty()) {
             model.addAttribute("messsage","Fehlgeschlagen!");
             return "import";

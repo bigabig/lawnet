@@ -55,6 +55,7 @@ public class UploadController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String singleFileUpload(@RequestParam("file") MultipartFile file,
                                    RedirectAttributes redirectAttributes, Model model) {
+        model.addAttribute("module", "upload");
 
         if (file.isEmpty()) {
             model.addAttribute("message","Upload fehlgeschlagen!");
@@ -94,6 +95,7 @@ public class UploadController {
 
     @RequestMapping(value = "/upload")
     public String index(Model model) {
+        model.addAttribute("module", "upload");
         return "upload";
     }
 

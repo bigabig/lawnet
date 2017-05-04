@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css"></link>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway"></link>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
+    <style>
+        html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+    </style>
+    <title>List</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body class="w3-light-grey">
+
+<!-- Header -->
+<div th:replace="fragments/header :: header"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:78px;">
+
+    <!-- Content -->
+    <div class="w3-container" style="padding-top:22px">
+        <h5>Typ Suche</h5>
+        <form action="list" method="get">
+            <label>Typ:
+                <select name="typ" size="1">
+                    <option value=""> - </option>
+                    <option th:if="${typ.equals('urteil')}" selected="selected" value="urteil">Urteil</option>
+                    <option th:if="${!typ.equals('urteil')}" value="urteil">Urteil</option>
+                    <option th:if="${typ.equals('beschluss')}" selected="selected" value="beschluss">Beschluss</option>
+                    <option th:if="${!typ.equals('beschluss')}" value="beschluss">Beschluss</option>
+                    <option th:if="${typ.equals('verweis')}" selected="selected" value="verweis">Verweis</option>
+                    <option th:if="${!typ.equals('verweis')}" value="verweis">Verweis</option>
+                    <option th:if="${typ.equals('norm')}" selected="selected" value="norm">Norm</option>
+                    <option th:if="${!typ.equals('norm')}" value="norm">Norm</option>
+                </select>
+            </label>
+            <input type="submit" value="Anzeigen"></input>
+        </form>
+        <div th:if="${message != null }">
+            <p th:text="${message}" />
+        </div>
+        <div th:if="${messages != null }">
+            <ul>
+                <li th:each="msg : ${messages}"><a th:text="${msg}" th:href="@{/detail(id=${msg})}"></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <!-- End page content -->
+</div>
+</body>
+</html>

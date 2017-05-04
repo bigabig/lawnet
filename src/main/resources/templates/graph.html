@@ -39,28 +39,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body class="w3-light-grey">
-    <!-- Top container -->
-    <div class="w3-container w3-top w3-white w3-large w3-padding" style="z-index:4">
-        <button class="w3-button w3-hide-large w3-padding-0 w3-black w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i></button>
-        <img src="img/logo.svg" alt="Bucerius Law School" height="60px"></img>
-        <span style=" font-size: 20px; margin-left: 45px;">Super-Tool</span>
-    </div>
 
-    <!-- Sidenav/menu -->
-    <nav class="w3-sidenav w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidenav">
-        <div class="w3-container">
-            <h5>Functions</h5>
-        </div>
-        <a href="#" class="w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
-        <a href="graph" class="w3-padding w3-blue"><i class="fa fa-search fa-fw"></i>  Suchen</a>
-        <a href="upload" class="w3-padding"><i class="fa fa-upload fa-fw"></i>  Upload</a>
-        <a href="import" class="w3-padding"><i class="fa fa-files-o fa-fw"></i>  Import</a>
-        <a href="delete" class="w3-padding"><i class="fa fa-trash fa-fw"></i>  Löschen</a>
-    </nav>
-
-
-    <!-- Overlay effect when opening sidenav on small screens -->
-    <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+    <!-- Header -->
+    <div th:replace="fragments/header :: header"></div>
 
     <!-- !PAGE CONTENT! -->
     <div class="w3-main" style="margin-left:300px;margin-top:78px;">
@@ -159,14 +140,11 @@
             </div>
         </div>
     </div>
-        <hr></hr>
 
     <!-- Footer -->
-    <footer class="w3-container w3-padding-16 w3-light-grey">
-        <h4>FOOTER</h4>
-        <p>Developed by Tim Fischer &amp; Bobby Wu</p>
-    </footer>
-    <!-- End page content -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+<!-- End page content -->
 </div>
 
 

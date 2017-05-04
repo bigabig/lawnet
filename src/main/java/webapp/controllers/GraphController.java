@@ -50,6 +50,8 @@ public class GraphController {
                        @RequestParam(value="typ", required=false, defaultValue="") String typ,
                        @RequestParam(value="zitat", required=false, defaultValue="active") String zitat, Model model) {
 
+        model.addAttribute("module", "graph");
+
         String message = "Aktenzeichen: "+aktenzeichen+"\nDatum: "+datum+"\nTyp: "+typ+"\nZitat: "+zitat;
         model.addAttribute("aktenzeichen", aktenzeichen);
         model.addAttribute("datum", datum);

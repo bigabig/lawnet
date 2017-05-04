@@ -40,6 +40,8 @@ public class DeleteController {
 
     @RequestMapping("/delete")
     public String delete(@RequestParam(value="aktenzeichen", required=false, defaultValue="") String aktenzeichen, Model model) {
+        model.addAttribute("module", "delete");
+
         List<String> messages = new ArrayList<>();
 
         if(aktenzeichen.equals("")) {

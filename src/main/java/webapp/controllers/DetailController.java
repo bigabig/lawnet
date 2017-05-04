@@ -37,6 +37,7 @@ public class DetailController {
 
     @RequestMapping("/detail")
     public String details(@RequestParam(value="id", required=false, defaultValue="") String aktenzeichen, Model model) {
+        model.addAttribute("module", "detail");
 
         // Daten aus der Datenbank holen
         Metadata metadata = metadataDao.findByAktenzeichen(aktenzeichen);
