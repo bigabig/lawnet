@@ -43,7 +43,7 @@ public class GraphController {
 
     // private static String GRAPH_FOLDER = System.getProperty("user.dir")+"\\graphen\\";
 
-    @RequestMapping("/graph")
+    @RequestMapping(value={"/","/graph"})
     public String find(@RequestParam(value="filename", required=false, defaultValue="") String dateiname,
                        @RequestParam(value="aktenzeichen", required=false, defaultValue="") String aktenzeichen,
                        @RequestParam(value="datum", required=false, defaultValue="") String datum,
