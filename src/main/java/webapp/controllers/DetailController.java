@@ -2,6 +2,9 @@ package webapp.controllers;
 
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +13,7 @@ import webapp.graph.Draw;
 import webapp.graph.Link;
 import webapp.graph.Node;
 import webapp.models.*;
+import webapp.models.watson.WatsonHelper;
 
 import java.io.File;
 import java.io.FileWriter;
