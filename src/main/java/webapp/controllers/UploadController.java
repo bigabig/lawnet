@@ -13,12 +13,15 @@ import webapp.models.Dokument;
 import webapp.models.DokumentDao;
 import webapp.models.MetadataDao;
 import webapp.models.ZitatDao;
+import webapp.models.watson.WatsonHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Properties;
 
 /**
  * Created by Bobby on 23.02.2017.
@@ -41,15 +44,18 @@ public class UploadController {
 
     //Save the uploaded file to this folder
     //private static String UPLOADED_FOLDER = System.getProperty("user.home")+"\\Desktop\\Webapp\\Upload\\";
-    private static File UPLOADED_FOLDER;
+    private static String UPLOADED_FOLDER;
 
-    static{
+    static {
+        Properties properties = new Properties();
         try {
-            UPLOADED_FOLDER = new File(File.createTempFile("deleteme", "").getParent(), "lawnet-upload");
-            UPLOADED_FOLDER.mkdir();
+            InputStream is = WatsonHelper.class.getResourceAsStream("/watson.properties");
+            properties.load(is);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        UPLOADED_FOLDER = properties.getProperty("uploadpath");
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)

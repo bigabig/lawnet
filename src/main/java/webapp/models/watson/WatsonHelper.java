@@ -7,6 +7,7 @@ import com.ibm.watson.developer_cloud.natural_language_understanding.v1.model.An
 import com.ibm.watson.developer_cloud.natural_language_understanding.v1.model.Features;
 import com.ibm.watson.developer_cloud.natural_language_understanding.v1.model.EntitiesOptions;
 
+import com.ibm.watson.developer_cloud.service.exception.InternalServerErrorException;
 import webapp.models.Metadata;
 
 import java.io.*;
@@ -20,6 +21,7 @@ import java.util.*;
 public class WatsonHelper {
 
     private NaturalLanguageUnderstanding service;
+    private String model;
 
     public WatsonHelper() {
         // Watson API Initialisierung
@@ -36,12 +38,15 @@ public class WatsonHelper {
         String user = properties.getProperty("user");
         String pass = properties.getProperty("pass");
         service.setUsernameAndPassword(user, pass);
+
+        model = properties.getProperty("model");
     }
 
     public String findEntities(String content) {
         // Watson API Input
         EntitiesOptions entities= new EntitiesOptions.Builder()
                 .sentiment(false)
+                .model(model)
                 .limit(250)
                 .build();
 
@@ -94,6 +99,11 @@ public class WatsonHelper {
             }
         }
 
+        if(datum == null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-M-yyyy", Locale.GERMAN);
+            datum = LocalDate.parse("01-01-9999", formatter);
+        }
+
         return new Metadata(aktenzeichen, datum.toString(), typ);
     }
 
@@ -113,29 +123,5 @@ public class WatsonHelper {
         }
 
         return result;
-    }
-
-    public void TestNLU() {
-        String input = "IBM is an American multinational technology company headquartered in Armonk, New York, United States, with operations in over 170 countries.";
-
-        EntitiesOptions entities= new EntitiesOptions.Builder()
-                .sentiment(false)
-                .limit(250)
-                .build();
-
-        Features features = new Features.Builder()
-                .entities(entities)
-                .build();
-
-        AnalyzeOptions parameters = new AnalyzeOptions.Builder()
-                .text(input)
-                .features(features)
-                .build();
-
-        AnalysisResults response = service
-                .analyze(parameters)
-                .execute();
-
-        System.out.println(response);
     }
 }

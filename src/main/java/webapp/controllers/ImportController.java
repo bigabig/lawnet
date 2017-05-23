@@ -12,30 +12,21 @@ import webapp.importer.ImportRunnable;
 import webapp.models.DokumentDao;
 import webapp.models.MetadataDao;
 import webapp.models.ZitatDao;
+import webapp.models.watson.WatsonHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Properties;
 
 /**
  * Created by tim on 28.02.2017.
  */
 @Controller
 public class ImportController {
-
-    //Save the uploaded file to this folder
-    private static File UPLOADED_FOLDER;
-
-    static{
-        try {
-            UPLOADED_FOLDER = new File(File.createTempFile("deleteme", "").getParent(), "lawnet-import");
-            UPLOADED_FOLDER.mkdir();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Autowired
     private MetadataDao metadataDao;
@@ -45,6 +36,22 @@ public class ImportController {
 
     @Autowired
     private ZitatDao zitatDao;
+
+    //Save the uploaded file to this folder
+    //private static String UPLOADED_FOLDER = System.getProperty("user.home")+"\\Desktop\\Webapp\\Upload\\";
+    private static String UPLOADED_FOLDER;
+
+    static {
+        Properties properties = new Properties();
+        try {
+            InputStream is = WatsonHelper.class.getResourceAsStream("/watson.properties");
+            properties.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        UPLOADED_FOLDER = properties.getProperty("uploadpath");
+    }
 
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     public String singleFileUpload(@RequestParam("file") MultipartFile file,

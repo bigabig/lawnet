@@ -1,12 +1,16 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css"></link>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway"></link>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
     <style>
         html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+        @media (max-width: 992px) {
+        .w3-main {
+            margin-top: 44px !important;
+        }
+        }
     </style>
     <style>
     #links polyline {
@@ -37,61 +41,64 @@
     </style>
     <title>Graph</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 <body class="w3-light-grey">
 
-    <!-- Header -->
-    <div th:replace="fragments/header :: header"></div>
+<!-- Header -->
+<div th:replace="fragments/header :: header"></div>
 
-    <!-- !PAGE CONTENT! -->
-    <div class="w3-main" style="margin-left:300px;margin-top:78px;">
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:80px;">
 
-        <div class="w3-container" style="padding-top:22px">
-            <h5>Input</h5>
+    <!-- Content -->
+    <div class="w3-container" style="padding-top:22px">
+        <h5>Input</h5>
 
-            <form action="graph" method="get">
-                <label>Aktenzeichen
-                    <input type="text" name="aktenzeichen" th:value="${aktenzeichen}"></input>
-                </label>
-                <label>Datum
-                    <input type="date" name="datum" th:value="${datum}" min="2015-01-01" max="2018-01-01"></input>
-                </label>
-                <label>Typ:
-                    <select name="typ" size="1">
-                        <option value="">Alle Typen</option>
-                        <option th:if="${typ.equals('urteil')}" selected="selected" value="urteil">Urteil</option>
-                        <option th:if="${!typ.equals('urteil')}" value="urteil">Urteil</option>
-                        <option th:if="${typ.equals('beschluss')}" selected="selected" value="beschluss">Beschluss</option>
-                        <option th:if="${!typ.equals('beschluss')}" value="beschluss">Beschluss</option>
-                        <option th:if="${typ.equals('verweis')}" selected="selected" value="verweis">Verweis</option>
-                        <option th:if="${!typ.equals('verweis')}" value="verweis">Verweis</option>
-                        <option th:if="${typ.equals('norm')}" selected="selected" value="norm">Norm</option>
-                        <option th:if="${!typ.equals('norm')}" value="norm">Norm</option>
-                    </select>
-                </label>
-                <label>Zitierung:
-                    <select name="zitat" size="1">
-                        <option th:if="${zitat.equals('active')}" selected="selected" value="active">Aktiv</option>
-                        <option th:if="${!zitat.equals('active')}" value="active">Aktiv</option>
-                        <option th:if="${zitat.equals('passiv')}" selected="selected" value="passiv">Passiv</option>
-                        <option th:if="${!zitat.equals('passiv')}" value="passiv">Passiv</option>
-                        <option th:if="${zitat.equals('actpas')}" selected="selected" value="actpas">Aktiv &amp; Passiv</option>
-                        <option th:if="${!zitat.equals('actpas')}" value="actpas">Aktiv &amp; Passiv</option>
-                    </select>
-                </label>
-                <input type="submit" value="Suchen!"></input>
-            </form>
+        <form action="graph" method="get">
+            <label>Aktenzeichen
+                <input type="text" name="aktenzeichen" th:value="${aktenzeichen}"></input>
+            </label>
+            <label>Datum
+                <input type="date" name="datum" th:value="${datum}" min="2015-01-01" max="2018-01-01"></input>
+            </label>
+            <label>Typ:
+                <select name="typ" size="1">
+                    <option value="">Alle Typen</option>
+                    <option th:if="${typ.equals('urteil')}" selected="selected" value="urteil">Urteil</option>
+                    <option th:if="${!typ.equals('urteil')}" value="urteil">Urteil</option>
+                    <option th:if="${typ.equals('beschluss')}" selected="selected" value="beschluss">Beschluss</option>
+                    <option th:if="${!typ.equals('beschluss')}" value="beschluss">Beschluss</option>
+                    <option th:if="${typ.equals('verweis')}" selected="selected" value="verweis">Verweis</option>
+                    <option th:if="${!typ.equals('verweis')}" value="verweis">Verweis</option>
+                    <option th:if="${typ.equals('norm')}" selected="selected" value="norm">Norm</option>
+                    <option th:if="${!typ.equals('norm')}" value="norm">Norm</option>
+                </select>
+            </label>
+            <label>Zitierung:
+                <select name="zitat" size="1">
+                    <option th:if="${zitat.equals('active')}" selected="selected" value="active">Aktiv</option>
+                    <option th:if="${!zitat.equals('active')}" value="active">Aktiv</option>
+                    <option th:if="${zitat.equals('passiv')}" selected="selected" value="passiv">Passiv</option>
+                    <option th:if="${!zitat.equals('passiv')}" value="passiv">Passiv</option>
+                    <option th:if="${zitat.equals('actpas')}" selected="selected" value="actpas">Aktiv &amp; Passiv</option>
+                    <option th:if="${!zitat.equals('actpas')}" value="actpas">Aktiv &amp; Passiv</option>
+                </select>
+            </label>
+            <input type="submit" value="Suchen!"></input>
+        </form>
 
-        </div>
+    </div>
 
-        <div class="w3-container w3-section">
-            <div class="w3-row-padding" style="margin:0 -16px">
-                <div class="w3-twothird">
-                    <h5 th:text="'Graph - '+${message}"></h5>
-                    <div th:if="${fehler} != null">
-                        <p th:text="${fehler}"></p>
-                    </div>
-                    <div th:if="${fehler} == null">
+    <div class="w3-panel">
+        <div class="w3-row-padding" style="margin:0 -16px">
+            <div class="w3-twothird">
+                <h5 th:text="'Graph - '+${message}"></h5>
+                <div th:if="${fehler} != null">
+                    <p th:text="${fehler}"></p>
+                </div>
+                <div th:if="${fehler} == null">
+                    <div class="chart-container">
                         <svg width="1030" height="600" >
                             <marker id="arrow" markerWidth="10" markerHeight="10" refX="2" refY="2" orient="auto" markerUnits="strokeWidth">
                                 <path d="M0,0 L4,2 0,4"></path>
@@ -102,56 +109,81 @@
                                 <g id="nodes"></g>
                             </g>
                         </svg>
-                        <div id="menu">
-                            <button onclick="force.stop(); zoomFit(0.95, 500)">Fit</button>
-                        </div>
+                    </div>
+                    <div id="menu">
+                        <button onclick="force.stop(); zoomFit(0.95, 500)">Fit</button>
                     </div>
                 </div>
-                <div class="w3-third">
-                    <h5>Statistics</h5>
-                    <table class="w3-table w3-striped w3-white">
-                        <tr th:each="stat : ${statistik}">
-                            <td th:text="${stat}"></td>
-                        </tr>
-                    </table>
+            </div>
+            <div class="w3-third">
+                <h5>Statistics</h5>
+                <table class="w3-table w3-striped w3-white">
+                    <tr th:each="stat : ${statistik}">
+                        <td th:text="${stat}"></td>
+                    </tr>
+                </table>
 
-                    <br/>
+                <br/>
 
-                    <h5>Legende</h5>
-                    <table class="w3-table w3-striped w3-white">
-                        <tr>
-                            <td><div class="circle" style="background: #0174DF;"></div></td>
-                            <td>Urteil</td>
-                        </tr>
-                        <tr>
-                            <td><div class="circle" style="background: #04B404;"></div></td>
-                            <td>Beschluss</td>
-                        </tr>
-                        <tr>
-                            <td><div class="circle" style="background: #DF7401;"></div></td>
-                            <td>Verweis</td>
-                        </tr>
-                        <tr>
-                            <td><div class="circle" style="background: #FFBF00;"></div></td>
-                            <td>Norm</td>
-                        </tr>
-                    </table>
-
+                <h5>Legende</h5>
+                <table class="w3-table w3-striped w3-white">
+                    <tr>
+                        <td><div class="circle" style="background: #0174DF;"></div></td>
+                        <td>Urteil</td>
+                    </tr>
+                    <tr>
+                        <td><div class="circle" style="background: #04B404;"></div></td>
+                        <td>Beschluss</td>
+                    </tr>
+                    <tr>
+                        <td><div class="circle" style="background: #DF7401;"></div></td>
+                        <td>Verweis</td>
+                    </tr>
+                    <tr>
+                        <td><div class="circle" style="background: #FFBF00;"></div></td>
+                        <td>Norm</td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
 
+    <hr></hr>
+
     <!-- Footer -->
     <div th:replace="fragments/footer :: footer"></div>
 
-<!-- End page content -->
+    <!-- End page content -->
 </div>
 
+<script>
+// Get the Sidebar
+var mySidebar = document.getElementById("mySidebar");
 
+// Get the DIV with overlay effect
+var overlayBg = document.getElementById("myOverlay");
 
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script th:inline="javascript">
+// Toggle between showing and hiding the sidebar, and add overlay effect
+function w3_open() {
+    if (mySidebar.style.display === 'block') {
+        mySidebar.style.display = 'none';
+        overlayBg.style.display = "none";
+    } else {
+        mySidebar.style.display = 'block';
+        overlayBg.style.display = "block";
+    }
+}
+
+// Close the sidebar with the close button
+function w3_close() {
+    mySidebar.style.display = "none";
+    overlayBg.style.display = "none";
+}
+</script>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script th:inline="javascript">
     /*<![CDATA[*/
 
     var zoom = d3.behavior
@@ -165,15 +197,17 @@
         })
     ;
 
-    var svg = d3
-        .select('svg')
-        .call(zoom);
+    var $container = $('.chart-container'),
+        width = $container.width(),
+        height = $container.height();
 
-    var svg = d3.select("svg"),
-        width = +svg.attr("width"),
-        height = +svg.attr("height");
+    var svg = d3.select('svg')
+        .attr("width", '100%')
+        .attr("height", '100%')
+        .attr('viewBox','0 0 '+Math.min(width,height) +' '+Math.min(width,height) * 9/16 )
+        .attr('preserveAspectRatio','xMinYMin');
 
-        console.log(svg);
+    svg.call(zoom);
 
     var root = svg.select('#root');
     var node_group = svg.select('#nodes');
@@ -280,16 +314,22 @@
         var midX = bounds.x + width / 2,
             midY = bounds.y + height / 2;
         if (width == 0 || height == 0) return; // nothing to fit
+        scale = min( dst.width/src.width, dst.height/src.height)
         var scale = (paddingPercent || 0.75) / Math.max(width / fullWidth, height / fullHeight);
         var translate = [fullWidth / 2 - scale * midX, fullHeight / 2 - scale * midY];
 
+        console.log(fullWidth);
+        console.log(fullHeight);
+        console.log(width);
+        console.log(height);
         console.trace("zoomFit", translate, scale);
         root
             .transition()
             .duration(transitionDuration || 0) // milliseconds
             .call(zoom.translate(translate).scale(scale).event);
     }
+
     /*]]>*/
-    </script>
+</script>
 </body>
 </html>
