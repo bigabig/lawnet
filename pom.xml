@@ -17,6 +17,10 @@
     <relativePath />
   </parent>
 
+  <distributionManagement>
+    <downloadUrl>https://github.com/bigabig/webapp</downloadUrl>
+  </distributionManagement>
+
   <!-- ... -->
   <packaging>war</packaging>
   <!-- ... -->
@@ -58,6 +62,25 @@
       <groupId>com.ibm.watson.developer_cloud</groupId>
       <artifactId>java-sdk</artifactId>
       <version>3.8.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-deploy-plugin</artifactId>
+      <version>2.8.2</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-core</artifactId>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+      <version>4.1</version>
     </dependency>
 
   </dependencies>

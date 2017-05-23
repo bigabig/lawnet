@@ -110,13 +110,15 @@
                             </g>
                         </svg>
                     </div>
+                    <!--
                     <div id="menu">
                         <button onclick="force.stop(); zoomFit(0.95, 500)">Fit</button>
                     </div>
+                    ! -->
                 </div>
             </div>
             <div class="w3-third">
-                <h5>Statistics</h5>
+                <h5>Statistics (am meisten zitiert)</h5>
                 <table class="w3-table w3-striped w3-white">
                     <tr th:each="stat : ${statistik}">
                         <td th:text="${stat}"></td>

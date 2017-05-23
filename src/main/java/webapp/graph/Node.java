@@ -38,6 +38,13 @@ public class Node {
         return (this.id.equals(otherNode.id));
     }
 
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
     public void setGroup(int value) { this.group = value; }
+    public int getGroup() { return group; }
+    public String getId() { return this.id; }
 
 }

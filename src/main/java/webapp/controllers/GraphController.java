@@ -1,6 +1,7 @@
 package webapp.controllers;
 
 import com.google.gson.Gson;
+import org.apache.commons.collections4.bag.HashBag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -59,48 +61,149 @@ public class GraphController {
         model.addAttribute("zitat", zitat);
         model.addAttribute("message", message);
         System.out.println(message);
-        String filename = "";
+        String filename = "error.json";
 
         // MySQL-Abfrage abhängig vom Request
         // Generierung des Dateinamens abhängig vom Request
-        List<Metadata> meta = null;
+        List<Object[]> result = null;
         if(dateiname.equals("") && aktenzeichen.equals("") && datum.equals("") && typ.equals("") ) {
             return "graph";
         } else if (!dateiname.equals("")) {
-            Dokument d = dokumentDao.findByDateiname(dateiname);
-            meta = new ArrayList<Metadata>();
-            Metadata m = metadataDao.findByAktenzeichen(d.getAktenzeichen());
-            if(m != null)
-                meta.add(m);
+            result = metadataDao.documentQuery(dateiname);
             filename = "dateiname-"+dateiname+"-suche.json";
         } else if (aktenzeichen.equals("") && datum.equals("") && typ.equals("") ) {
             return "graph";
         } else if(!aktenzeichen.equals("")) {
-            meta = metadataDao.findByAktenzeichenStartingWith(aktenzeichen);
-            filename = "aktenzeichen-"+aktenzeichen.replace(":","_")+"-suche.json";
+            if(zitat.equals("active")) {
+                result = metadataDao.activeAktQuery(aktenzeichen);
+                filename = "aktenzeichen-active-"+aktenzeichen.replace(":","_")+"-suche.json";
+            } else if (zitat.equals("passiv")) {
+                result = metadataDao.passivAktQuery(aktenzeichen);
+                filename = "aktenzeichen-passiv-"+aktenzeichen.replace(":","_")+"-suche.json";
+            } else if (zitat.equals("actpas")) {
+                result = metadataDao.activeAktQuery(aktenzeichen);
+                result.addAll(metadataDao.passivAktQuery(aktenzeichen));
+                filename = "aktenzeichen-actpas-"+aktenzeichen.replace(":","_")+"-suche.json";
+            }
         } else if(!datum.equals("") && !typ.equals("")) {
-            meta = metadataDao.findByDatumAndTyp(datum, typ);
-            filename = "datumtyp-"+datum+typ+"-suche.json";
+            if(zitat.equals("active")) {
+                result = metadataDao.activeDatTypQuery(datum, typ);
+                filename = "datumtyp-active-"+datum+typ+"-suche.json";
+            } else if (zitat.equals("passiv")) {
+                result = metadataDao.passivDatTypQuery(datum, typ);
+                filename = "datumtyp-passiv-"+datum+typ+"-suche.json";
+            } else if (zitat.equals("actpas")) {
+                result = metadataDao.activeDatTypQuery(datum, typ);
+                result.addAll(metadataDao.passivDatTypQuery(datum, typ));
+                filename = "datumtyp-actpas-"+datum+typ+"-suche.json";
+            }
         } else if(!datum.equals("")) {
-            meta = metadataDao.findByDatum(datum);
-            filename = "datum-"+datum+"-suche.json";
+            if(zitat.equals("active")) {
+                result = metadataDao.activeDatQuery(datum);
+                filename = "datum-active-"+datum+"-suche.json";
+            } else if (zitat.equals("passiv")) {
+                result = metadataDao.passivDatQuery(datum);
+                filename = "datum-passiv-"+datum+"-suche.json";
+            } else if (zitat.equals("actpas")) {
+                result = metadataDao.activeDatQuery(datum);
+                result.addAll(metadataDao.passivDatQuery(datum));
+                filename = "datum-actpas-"+datum+"-suche.json";
+            }
         } else if(!typ.equals("")) {
-            meta = metadataDao.findByTyp(typ);
-            filename = "typ-"+typ+"-suche.json";
+            if(zitat.equals("active")) {
+                result = metadataDao.activeTypQuery(typ);
+                filename = "typ-active-"+typ+"-suche.json";
+            } else if (zitat.equals("passiv")) {
+                result = metadataDao.passivTypQuery(typ);
+                filename = "typ-passiv-"+typ+"-suche.json";
+            } else if (zitat.equals("actpas")) {
+                result = metadataDao.activeTypQuery(typ);
+                result.addAll(metadataDao.passivTypQuery(typ));
+                filename = "typ-actpas-"+typ+"-suche.json";
+            }
         }
 
-        if(meta == null || meta.isEmpty() || !(zitat.equals("active") || zitat.equals("passiv") || zitat.equals("actpas"))) {
+        if(result == null || result.isEmpty() || !(zitat.equals("active") || zitat.equals("passiv") || zitat.equals("actpas"))) {
             model.addAttribute("fehler", "Zu dieser Suchanfrage gibt es leider keine Ergebnisse!");
             return "graph";
         }
+
+        HashSet<Node> nodeSet = new HashSet<Node>();
+        List<Link> links = new ArrayList<Link>();
+        HashBag<Node> bag = new HashBag<>();
+
+        // 0 = Ak1 | 1 = Dat1 | 2 = Typ1 | 3 = Ak2 | 4 = Dat2 | 5 = Typ2
+        for(Object[] objects : result) {
+
+            String ak1 = (String) objects[0];
+            String ak2 = (String) objects[3];
+            String typ1 = (String) objects[2];
+            String typ2 = (String) objects[5];
+
+            Node n1 = new Node(ak1, getColor(typ1), 7);
+            Node n2 = new Node(ak2, getColor(typ2), 4);
+
+            nodeSet.add(n1);
+            nodeSet.add(n2);
+
+            if(zitat.equals("active")) {
+                bag.add(n2);
+            } else if (zitat.equals("passiv")) {
+                bag.add(n1);
+            } else if (zitat.equals("actpas")) {
+                bag.add(n1);
+                bag.add(n2);
+            }
+
+            links.add(new Link(ak1, ak2, 5));
+        }
+
+        List<Node> nodes = new ArrayList<>();
+        for(Node n : nodeSet) {
+            nodes.add(n);
+        }
+
+        Node[] topNodes = new Node[5]; // Urteil = 1, Beschluss = 2, Verweis = 3, Norm = 4
+        int[] topCount = new int[5];
+        for(Node n : bag) {
+            int group = n.getGroup();
+            int count = bag.getCount(n);
+
+            if(count > 1 && count > topCount[group]) {
+                topCount[group] = count;
+                topNodes[group] = n;
+            }
+        }
+
+        List<String> statistik = new ArrayList<>();
+        for(Node node : topNodes) {
+            if(node != null) {
+                statistik.add("Top " + getTypName(node.getGroup()) + ": " + node.getId());
+            }
+        }
+
+        Draw graph = new Draw(nodes, links);
+        Gson g = new Gson();
+        String data = g.toJson(graph);
+        System.out.println(data);
+
+        /*
+
+
 
         List<Metadata> allMetadata = findAllMetadata(meta, zitat);
 
         // Metadaten nach JSON-String umwandeln
         String data = metaToJSON(meta, allMetadata, zitat);
 
+
+        // JSON-String als JSON-Datei abspeichern
+        saveJSONFile(filename, data);
+
+        */
+
         // Statistik erheben
-        model.addAttribute("statistik", makeStatistic(allMetadata));
+        model.addAttribute("statistik", statistik);
 
         // JSON-String als JSON-Datei abspeichern
         saveJSONFile(filename, data);
@@ -230,6 +333,20 @@ public class GraphController {
                 return 4;
         }
         return 0;
+    }
+
+    private String getTypName(int i) {
+        switch(i) {
+            case 1:
+                return "Urteil";
+            case 2:
+                return "Beschluss";
+            case 3:
+                return "Verweis";
+            case 4:
+                return "Norm";
+        }
+        return "error";
     }
 
     private Metadata[] test(List<Metadata> meta) {
